@@ -1,0 +1,41 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="hero">
+    <div class="container">
+        <h1>UNLABELED</h1>
+        <p>Prendas con control detallado de inventario. E-commerce B2C especializado.</p>
+        <a href="{% url 'products:product_list' %}" class="btn">Explorar Colección</a>
+    </div>
+</section>
+
+<section class="container">
+    <h2 class="section-title">Destacados</h2>
+
+    <div class="product-grid">
+        {% for product in featured_products %}
+        <div class="product-card">
+            <div class="product-image-container">
+                {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
+                {% else %}
+                <!-- Placeholder if no image -->
+                <div class="product-image" style="display:flex;align-items:center;justify-content:center;color:#666;">
+                    Sin Imagen</div>
+                {% endif %}
+            </div>
+            <div class="product-info">
+                <h3 class="product-name">{{ product.name }}</h3>
+                <p class="product-price">${{ product.price }}</p>
+                <a href="{% url 'products:product_detail' product.slug %}" class="btn"
+                    style="padding: 8px 20px; font-size: 0.8rem;">Ver Detalles</a>
+            </div>
+        </div>
+        {% empty %}
+        <p style="text-align: center; grid-column: 1/-1; color: var(--text-secondary);">Próximamente: Nuevas colecciones
+            oscuras.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
