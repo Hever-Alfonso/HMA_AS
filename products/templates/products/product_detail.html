@@ -1,0 +1,132 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} - UNLABELED{% endblock %}
+
+{% block content %}
+<section class="product-detail container">
+    <div class="product-detail-grid">
+
+        <!-- Galería -->
+        <div class="product-detail-gallery">
+            {% if product.image %}
+            <div class="product-detail-main-image">
+                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+            </div>
+            {% else %}
+            <div class="product-detail-main-image placeholder">
+                <span>Sin imagen</span>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Info -->
+        <div class="product-detail-info">
+            <h1 class="product-detail-name">{{ product.name }}</h1>
+
+            <p class="product-detail-price">
+                ${{ product.price }}
+            </p>
+
+            <p class="product-detail-short">
+                {{ product.description|truncatewords:20 }}
+            </p>
+
+            <div class="product-detail-long">
+                {{ product.description|linebreaks }}
+            </div>
+
+            {% if product.materials %}
+            <p class="product-detail-meta">
+                <span>Materiales:</span> {{ product.materials }}
+            </p>
+            {% endif %}
+
+            <!-- Formulario de carrito -->
+            <form action="{% url 'cart:add' %}" method="post" class="product-detail-form">
+                {% csrf_token %}
+                <input type="hidden" name="product_id" value="{{ product.id }}">
+
+                <!-- Tallas -->
+                <div class="product-detail-sizes">
+                    <span class="product-detail-label">Talla</span>
+                    <div class="size-chips">
+                        {% for item in inventory_items %}
+                        {% if item.quantity > 0 %}
+                        <label class="size-chip">
+                            <input type="radio" name="size_id" value="{{ item.size }}" required>
+                            <span>{{ item.size }}</span>
+                        </label>
+                        {% else %}
+                        <label class="size-chip size-chip-disabled" title="Agotado">
+                            <input type="radio" disabled>
+                            <span>{{ item.size }}</span>
+                        </label>
+                        {% endif %}
+                        {% empty %}
+                        <p class="product-detail-no-sizes">
+                            No hay tallas configuradas para este producto.
+                        </p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Cantidad -->
+                <div class="product-detail-quantity">
+                    <label for="quantity" class="product-detail-label">Cantidad</label>
+                    <input type="number" id="quantity" name="quantity" min="1" value="1">
+                </div>
+
+                <!-- Botón de carrito -->
+                <button type="submit" class="btn" style="margin-top: 1.5rem;">
+                    Agregar al carrito
+                </button>
+            </form>
+        </div>
+    </div>
+
+    {% if related_products %}
+    <section class="product-related">
+        <h2 class="section-title">También te puede gustar</h2>
+        <div class="product-grid">
+            {% for p in related_products %}
+            <div class="product-card">
+                <div class="product-image-container">
+                    <a href="{% url 'products:product_detail' p.slug %}">
+                        {% if p.image %}
+                        <img src="{{ p.image.url }}" alt="{{ p.name }}" class="product-image">
+                        {% else %}
+                        <div class="product-image"
+                            style="display:flex;align-items:center;justify-content:center;color:#666;">
+                            Sin Imagen
+                        </div>
+                        {% endif %}
+                    </a>
+                </div>
+                <div class="product-info">
+                    <h3 class="product-name">{{ p.name }}</h3>
+                    <p class="product-price">${{ p.price }}</p>
+                    <a href="{% url 'products:product_detail' p.slug %}" class="btn btn-sm">Ver</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.querySelector('.product-detail-form');
+        if (!form) return;
+
+        form.addEventListener('submit', function (e) {
+            const selectedSize = form.querySelector('input[name="size_id"]:checked');
+            if (!selectedSize) {
+                e.preventDefault();
+                alert('Por favor selecciona una talla antes de agregar el producto al carrito.');
+            }
+        });
+    });
+</script>
+{% endblock %}

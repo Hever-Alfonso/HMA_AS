@@ -1,0 +1,97 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Carrito de compras - UNLABELED{% endblock %}
+
+{% block content %}
+<section class="cart container">
+    <h1 class="section-title">Carrito de compras</h1>
+
+    {% if cart_items %}
+    <div class="cart-grid">
+        <div class="cart-items">
+            <table class="cart-table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Talla</th>
+                        <th>Precio</th>
+                        <th>Cantidad</th>
+                        <th>Subtotal</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cart_items %}
+                    <tr>
+                        <td class="cart-product">
+                            <div class="cart-product-info">
+                                {% if item.product.image %}
+                                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                                {% endif %}
+                                <div>
+                                    <div class="cart-product-name">{{ item.product.name }}</div>
+                                    <div class="cart-product-category">{{ item.product.category.name }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ item.size }}</td>
+                        <td>${{ item.unit_price }}</td>
+                        <td>
+                            <form action="{% url 'cart:update' %}" method="post" class="cart-quantity-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="product_id" value="{{ item.product.id }}">
+                                <input type="hidden" name="size_id" value="{{ item.size }}">
+                                <input type="number" name="quantity" min="0" value="{{ item.quantity }}"
+                                    class="cart-quantity-input">
+                            </form>
+                        </td>
+                        <td>${{ item.subtotal }}</td>
+                        <td>
+                            <form action="{% url 'cart:remove' %}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="product_id" value="{{ item.product.id }}">
+                                <input type="hidden" name="size_id" value="{{ item.size }}">
+                                <button type="submit" class="btn btn-sm btn-secondary">
+                                    Eliminar
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <aside class="cart-summary">
+            <h2>Resumen</h2>
+            <div class="cart-summary-line">
+                <span>Total</span>
+                <span>${{ cart_total }}</span>
+            </div>
+            <a href="{% url 'products:product_list' %}" class="btn btn-secondary btn-full" style="margin-top: 10px;">
+                Seguir comprando
+            </a>
+            <!-- Aquí luego se enlaza a /checkout/ -->
+            <button class="btn btn-full" style="margin-top: 10px;" disabled>
+                Proceder al pago (próxima HU)
+            </button>
+        </aside>
+    </div>
+    {% else %}
+    <p>Tu carrito está vacío. <a href="{% url 'products:product_list' %}">Explorar productos</a></p>
+    {% endif %}
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const qtyInputs = document.querySelectorAll('.cart-quantity-input');
+
+        qtyInputs.forEach(function (input) {
+            input.addEventListener('change', function () {
+                this.form.submit();
+            });
+        });
+    });
+</script>
+{% endblock %}
