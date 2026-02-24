@@ -1,0 +1,56 @@
+[
+    {
+        "model": "products.category",
+        "pk": 1,
+        "fields": {
+            "name": "Corsets",
+            "slug": "corsets",
+            "description": "Elegancia estructura y poder.",
+            "is_active": true
+        }
+    },
+    {
+        "model": "products.category",
+        "pk": 2,
+        "fields": {
+            "name": "Faldas",
+            "slug": "faldas",
+            "description": "Movimiento y oscuridad.",
+            "is_active": true
+        }
+    },
+    {
+        "model": "products.product",
+        "pk": 1,
+        "fields": {
+            "category": 1,
+            "name": "Corset Victoria",
+            "slug": "corset-victoria",
+            "short_description": "Corset bajo busto en brocado negro.",
+            "long_description": "Un clásico indispensable. Estructura rígida con varillas de acero.",
+            "price": "150000.00",
+            "materials": "Brocado, Acero",
+            "is_active": true,
+            "is_featured": true,
+            "created_at": "2023-10-01T12:00:00Z",
+            "updated_at": "2023-10-01T12:00:00Z"
+        }
+    },
+    {
+        "model": "products.product",
+        "pk": 2,
+        "fields": {
+            "category": 2,
+            "name": "Falda Asimétrica",
+            "slug": "falda-asimetrica",
+            "short_description": "Falda larga con cortes irregulares.",
+            "long_description": "Caída pesada y movimiento fluido. Perfecta para noches eternas.",
+            "price": "95000.00",
+            "materials": "Algodón pesado",
+            "is_active": true,
+            "is_featured": true,
+            "created_at": "2023-10-02T12:00:00Z",
+            "updated_at": "2023-10-02T12:00:00Z"
+        }
+    }
+]

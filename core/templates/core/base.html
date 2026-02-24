@@ -9,50 +9,61 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap"
+        rel="stylesheet">
     <!-- CSS -->
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 
 <body>
-    <header>
-        <div class="container nav-container">
-            <a href="{% url 'core:home' %}" class="logo">
-                UNLABELED
-            </a>
-            <nav>
-                <ul>
-                    <li><a href="{% url 'core:home' %}">Inicio</a></li>
-                    <li><a href="{% url 'products:product_list' %}">Tienda</a></li>
-                    <li><a href="{% url 'core:about' %}">Sobre UNLABELED</a></li>
-                    <li><a href="{% url 'cart:detail' %}">Carrito</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
-
-    <main>
-        {% if messages %}
-        <div class="messages">
-            <div class="container">
-                {% for message in messages %}
-                <div class="message message-{{ message.tags }}">
-                    {{ message }}
-                </div>
-                {% endfor %}
+    <div class="page-wrap">
+        <header>
+            <div class="container nav-container">
+                <a href="{% url 'core:home' %}" class="logo">UNLABELED</a>
+                <nav>
+                    <ul>
+                        <li><a href="{% url 'core:home' %}">Inicio</a></li>
+                        <li><a href="{% url 'products:product_list' %}">Tienda</a></li>
+                        <li><a href="{% url 'core:about' %}">Nosotros</a></li>
+                        <li><a href="{% url 'cart:detail' %}">Carrito</a></li>
+                    </ul>
+                </nav>
             </div>
-        </div>
-        {% endif %}
+        </header>
 
-        {% block content %}
-        {% endblock %}
-    </main>
+        <main>
+            {% if messages %}
+            <div class="messages">
+                <div class="container">
+                    {% for message in messages %}
+                    <div class="message message-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
 
-    <footer>
-        <div class="container">
-            <p>&copy; {% now "Y" %} UNLABELED. Todos los derechos reservados.</p>
-        </div>
-    </footer>
+            {% block content %}{% endblock %}
+        </main>
+
+        <footer>
+            <div class="container footer-inner">
+                <span class="footer-logo">UNLABELED</span>
+                <nav class="footer-links">
+                    <a href="{% url 'core:home' %}">Inicio</a>
+                    <a href="{% url 'products:product_list' %}">Tienda</a>
+                    <a href="{% url 'core:about' %}">Nosotros</a>
+                    <a href="{% url 'cart:detail' %}">Carrito</a>
+                </nav>
+                <div class="footer-rule"></div>
+                <p class="copyright">&copy; {% now "Y" %} UNLABELED. Todos los derechos reservados.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Minimal React CDN (only if needed by child templates) -->
+    {% block extra_js %}{% endblock %}
 </body>
 
 </html>
