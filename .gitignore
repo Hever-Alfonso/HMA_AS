@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Django
+*.log
+db.sqlite3
+media/
+
+# Entorno virtual
+venv/
+env/
+.env
+
+# Datos persistentes de Postgres
+postgres_data/data/
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
