@@ -1,0 +1,69 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Mi Perfil - UNLABELED{% endblock %}
+
+{% block content %}
+<section class="container" style="max-width: 600px; margin: 60px auto;">
+    <h1 class="section-title" style="text-align:center;">Mi Perfil</h1>
+
+    <div style="background:#1a1a1a; border-radius:8px; padding:30px; border:1px solid #333;">
+        <div style="margin-bottom: 16px;">
+            <strong style="color:#aaa;">Usuario:</strong>
+            <span style="color:#fff;">{{ user.username }}</span>
+        </div>
+        <div style="margin-bottom: 16px;">
+            <strong style="color:#aaa;">Email:</strong>
+            <span style="color:#fff;">{{ user.email }}</span>
+        </div>
+        <div style="margin-bottom: 16px;">
+            <strong style="color:#aaa;">Nombre:</strong>
+            <span style="color:#fff;">{{ user.first_name }} {{ user.last_name }}</span>
+        </div>
+        <div style="margin-bottom: 16px;">
+            <strong style="color:#aaa;">Teléfono:</strong>
+            <span style="color:#fff;">{{ user.telefono|default:"No registrado" }}</span>
+        </div>
+        <div style="margin-bottom: 16px;">
+            <strong style="color:#aaa;">Rol:</strong>
+            <span style="color:#fff;">{{ user.get_rol_display }}</span>
+        </div>
+        <div style="margin-bottom: 16px;">
+            <strong style="color:#aaa;">Miembro desde:</strong>
+            <span style="color:#fff;">{{ user.date_joined|date:"d M Y" }}</span>
+        </div>
+
+        <hr style="border-color:#333; margin: 24px 0;">
+
+        <h2 style="font-size:1.2rem; margin-bottom:16px; color:#fff;">Mis Órdenes Recientes</h2>
+
+        {% if user.ordenes.all %}
+        <div>
+            {% for orden in user.ordenes.all|slice:":5" %}
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid #333;">
+                <div>
+                    <strong style="color:#fff;">Orden #{{ orden.id }}</strong>
+                    <small style="color:#aaa; margin-left:8px;">{{ orden.fecha_orden|date:"d/m/Y" }}</small>
+                </div>
+                <div>
+                    <span style="padding:4px 10px; border-radius:12px; font-size:0.8rem; background:{% if orden.estado == 'pagada' %}#1a472a{% elif orden.estado == 'cancelada' %}#4a1a1a{% else %}#3a3a1a{% endif %}; color:{% if orden.estado == 'pagada' %}#4ade80{% elif orden.estado == 'cancelada' %}#f87171{% else %}#fbbf24{% endif %};">
+                        {{ orden.get_estado_display }}
+                    </span>
+                    <span style="margin-left:12px; font-weight:600; color:#fff;">${{ orden.monto_total|floatformat:"0" }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p style="color:#aaa;">Aún no has realizado ninguna orden. <a href="{% url 'products:product_list' %}" style="color:#fff; text-decoration:underline;">Explorar productos</a></p>
+        {% endif %}
+
+        <div style="margin-top:24px; text-align:center;">
+            <form method="post" action="{% url 'accounts:logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-secondary" style="border:1px solid #333; color:#fff;">Cerrar Sesión</button>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}
