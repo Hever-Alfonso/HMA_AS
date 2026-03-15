@@ -3,7 +3,7 @@
 
 {% block title %}
 {% if current_category_obj %}
-{{ current_category_obj.name }} - UNLABELED
+{{ current_category_obj.nombre }} - UNLABELED
 {% else %}
 Catalogo - UNLABELED
 {% endif %}
@@ -31,7 +31,7 @@ Catalogo - UNLABELED
                     <li>
                         <a href="{% url 'products:product_list_by_category' cat.slug %}"
                             class="{% if current_category_obj.slug == cat.slug %}active{% endif %}">
-                            {{ cat.name }}
+                            {{ cat.nombre }}
                         </a>
                     </li>
                     {% endfor %}
@@ -75,7 +75,7 @@ Catalogo - UNLABELED
         <div class="catalog-header">
             <h2>
                 {% if current_category_obj %}
-                {{ current_category_obj.name }}
+                {{ current_category_obj.nombre }}
                 {% else %}
                 Todos los Productos
                 {% endif %}
@@ -121,8 +121,8 @@ Catalogo - UNLABELED
             <div class="product-card">
                 <div class="product-image-container">
                     <a href="{% url 'products:product_detail' product.slug %}">
-                        {% if product.image %}
-                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
+                        {% if product.imagen %}
+                        <img src="{{ product.imagen.url }}" alt="{{ product.nombre }}" class="product-image">
                         {% else %}
                         <div class="product-image"
                             style="display:flex;align-items:center;justify-content:center;color:#666;">
@@ -132,8 +132,8 @@ Catalogo - UNLABELED
                     </a>
                 </div>
                 <div class="product-info">
-                    <h3 class="product-name">{{ product.name }}</h3>
-                    <p class="product-price">${{ product.price }}</p>
+                    <h3 class="product-name">{{ product.nombre }}</h3>
+                    <p class="product-price">${{ product.precio|floatformat:"0" }}</p>
                     <a href="{% url 'products:product_detail' product.slug %}" class="btn btn-sm">Ver</a>
                 </div>
             </div>
