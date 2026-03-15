@@ -1,6 +1,6 @@
 from decimal import Decimal
 from django.conf import settings
-from products.models import Product
+from products.models import Producto
 
 class Cart:
     SESSION_KEY = "cart"
@@ -13,39 +13,39 @@ class Cart:
             cart = self.session[self.SESSION_KEY] = {}
         self.cart = cart
 
-    def _make_key(self, product_id, size):
-        return f"{product_id}:{size}"
+    def _make_key(self, producto_id, talla):
+        return f"{producto_id}:{talla}"
 
-    def add(self, product, size, quantity=1, override_quantity=False):
-        product_id = str(product.id)
-        key = self._make_key(product_id, size)
+    def add(self, producto, talla, cantidad=1, override_cantidad=False):
+        producto_id = str(producto.id)
+        key = self._make_key(producto_id, talla)
 
         if key not in self.cart:
             self.cart[key] = {
-                "product_id": product_id,
-                "size": size,
-                "quantity": 0,
-                "price": str(product.price),
+                "producto_id": producto_id,
+                "talla": talla,
+                "cantidad": 0,
+                "precio_unitario": str(producto.precio),
             }
 
-        if override_quantity:
-            self.cart[key]["quantity"] = quantity
+        if override_cantidad:
+            self.cart[key]["cantidad"] = cantidad
         else:
-            self.cart[key]["quantity"] += quantity
+            self.cart[key]["cantidad"] += cantidad
 
-        if self.cart[key]["quantity"] <= 0:
+        if self.cart[key]["cantidad"] <= 0:
             del self.cart[key]
 
         self.save()
 
-    def remove(self, product, size):
-        key = self._make_key(str(product.id), size)
+    def remove(self, producto, talla):
+        key = self._make_key(str(producto.id), talla)
         if key in self.cart:
             del self.cart[key]
             self.save()
 
-    def update(self, product, size, quantity):
-        self.add(product, size, quantity=quantity, override_quantity=True)
+    def update(self, producto, talla, cantidad):
+        self.add(producto, talla, cantidad=cantidad, override_cantidad=True)
 
     def save(self):
         self.session[self.SESSION_KEY] = self.cart
@@ -57,31 +57,31 @@ class Cart:
 
     def __iter__(self):
         keys = list(self.cart.keys())
-        product_ids = {item["product_id"] for item in self.cart.values()}
-        products = {str(p.id): p for p in Product.objects.filter(id__in=product_ids)}
+        producto_ids = {item["producto_id"] for item in self.cart.values()}
+        productos = {str(p.id): p for p in Producto.objects.filter(id__in=producto_ids)}
 
         for key in keys:
             item = self.cart[key]
-            product = products.get(item["product_id"])
+            producto = productos.get(item["producto_id"])
 
-            if not product:
+            if not producto:
                 continue
 
-            price = Decimal(item["price"])
-            quantity = int(item["quantity"])
-            subtotal = price * quantity
+            precio = Decimal(item["precio_unitario"])
+            cantidad = int(item["cantidad"])
+            subtotal = precio * cantidad
 
             yield {
                 "key": key,
-                "product": product,
-                "size": item["size"],
-                "quantity": quantity,
-                "unit_price": price,
+                "producto": producto,
+                "talla": item["talla"],
+                "cantidad": cantidad,
+                "precio_unitario": precio,
                 "subtotal": subtotal,
             }
 
     def __len__(self):
-        return sum(int(item["quantity"]) for item in self.cart.values())
+        return sum(int(item["cantidad"]) for item in self.cart.values())
 
     @property
     def total(self):

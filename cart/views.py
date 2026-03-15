@@ -3,8 +3,9 @@ from django.views.generic import TemplateView
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
 
-from products.models import Product, StockBySize
+from products.models import Producto, StockPorTalla
 from .cart import Cart
+from .models import Carrito
 
 class CartDetailView(TemplateView):
     template_name = "cart/cart_detail.html"
@@ -19,66 +20,66 @@ class CartDetailView(TemplateView):
 class CartAddView(View):
     def post(self, request, *args, **kwargs):
         cart = Cart(request)
-        product_id = request.POST.get("product_id")
-        size = request.POST.get("size")
-        quantity = request.POST.get("quantity", 1)
+        producto_id = request.POST.get("product_id")
+        talla = request.POST.get("size_id")
+        cantidad = request.POST.get("quantity", 1)
 
-        product = get_object_or_404(Product, id=product_id)
+        producto = get_object_or_404(Producto, id=producto_id)
 
-        if not size:
+        if not talla:
             messages.error(request, "Debes seleccionar una talla.")
-            return redirect("products:product_detail", slug=product.slug)
+            return redirect("products:product_detail", slug=producto.slug)
 
         try:
-            quantity = int(quantity)
+            cantidad = int(cantidad)
         except (TypeError, ValueError):
-            quantity = 1
+            cantidad = 1
 
-        stock = StockBySize.objects.filter(productId=product, size=size).first()
-        available_stock = stock.quantity if stock else 0
+        stock = StockPorTalla.objects.filter(producto=producto, talla=talla).first()
+        available_stock = stock.cantidad if stock else 0
 
         if available_stock <= 0:
-            messages.error(request, f"La talla {size} está agotada.")
-            return redirect("products:product_detail", slug=product.slug)
+            messages.error(request, f"La talla {talla} está agotada.")
+            return redirect("products:product_detail", slug=producto.slug)
 
-        cart.add(productId=product, size=size, quantity=quantity)
+        cart.add(producto=producto, talla=talla, cantidad=cantidad)
         messages.success(request, "Producto agregado al carrito.")
         return redirect("cart:detail")
 
 class CartUpdateView(View):
     def post(self, request, *args, **kwargs):
         cart = Cart(request)
-        product_id = request.POST.get("product_id")
-        size = request.POST.get("size")
-        quantity = request.POST.get("quantity", 1)
+        producto_id = request.POST.get("product_id")
+        talla = request.POST.get("size_id")
+        cantidad = request.POST.get("quantity", 1)
 
-        product = get_object_or_404(Product, id=product_id)
+        producto = get_object_or_404(Producto, id=producto_id)
 
         try:
-            quantity = int(quantity)
+            cantidad = int(cantidad)
         except (TypeError, ValueError):
-            quantity = 1
+            cantidad = 1
 
-        if quantity <= 0:
-            cart.remove(productId=product, size=size)
+        if cantidad <= 0:
+            cart.remove(producto=producto, talla=talla)
             return redirect("cart:detail")
 
-        stock = StockBySize.objects.filter(productId=product, size=size).first()
-        available_stock = stock.quantity if stock else 0
+        stock = StockPorTalla.objects.filter(producto=producto, talla=talla).first()
+        available_stock = stock.cantidad if stock else 0
 
-        if quantity > available_stock:
-            messages.error(request, f"No hay suficiente stock para la talla {size}.")
+        if cantidad > available_stock:
+            messages.error(request, f"No hay suficiente stock para la talla {talla}.")
             return redirect("cart:detail")
 
-        cart.update(productId=product, size=size, quantity=quantity)
+        cart.update(producto=producto, talla=talla, cantidad=cantidad)
         return redirect("cart:detail")
 
 class CartRemoveView(View):
     def post(self, request, *args, **kwargs):
         cart = Cart(request)
-        product_id = request.POST.get("product_id")
-        size = request.POST.get("size")
+        producto_id = request.POST.get("product_id")
+        talla = request.POST.get("size_id")
 
-        product = get_object_or_404(Product, id=product_id)
-        cart.remove(productId=product, size=size)
+        producto = get_object_or_404(Producto, id=producto_id)
+        cart.remove(producto=producto, talla=talla)
         return redirect("cart:detail")

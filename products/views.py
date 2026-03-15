@@ -1,54 +1,53 @@
 from django.views.generic import ListView, DetailView
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
-from .models import Product, StockBySize, Category
+from .models import Producto, StockPorTalla, Categoria, Marca
 
 class ProductListView(ListView):
-    model = Product
+    model = Producto
     template_name = 'products/product_list.html'
     context_object_name = 'products'
     paginate_by = 12
 
     def get_queryset(self):
-        queryset = Product.objects.all()
+        queryset = Producto.objects.filter(activo=True)
+        self.categoria = None
         
         category_slug = self.kwargs.get('category_slug')
         if category_slug:
-            self.category = get_object_or_404(Category, slug=category_slug)
-            queryset = queryset.filter(category=self.category)
-        else:
-            self.category = None
+            self.categoria = get_object_or_404(Categoria, slug=category_slug)
+            queryset = queryset.filter(categoria=self.categoria)
         
         # Keyword Search
         query = self.request.GET.get('q')
         if query:
             queryset = queryset.filter(
-                Q(name__icontains=query) | 
-                Q(description__icontains=query)
+                Q(nombre__icontains=query) | 
+                Q(descripcion__icontains=query)
             )
 
         # Price Filter
         min_price = self.request.GET.get('min_price')
         max_price = self.request.GET.get('max_price')
         if min_price:
-            queryset = queryset.filter(price__gte=min_price)
+            queryset = queryset.filter(precio__gte=min_price)
         if max_price:
-            queryset = queryset.filter(price__lte=max_price)
+            queryset = queryset.filter(precio__lte=max_price)
 
         # Size Filter
         size_name = self.request.GET.get('size')
         if size_name:
             queryset = queryset.filter(
-                stock_items__size=size_name,
-                stock_items__quantity__gt=0
+                stock_por_talla__talla=size_name,
+                stock_por_talla__cantidad__gt=0
             ).distinct()
 
         # Sorting
         sort = self.request.GET.get('sort')
         if sort == 'price_asc':
-            queryset = queryset.order_by('price')
+            queryset = queryset.order_by('precio')
         elif sort == 'price_desc':
-            queryset = queryset.order_by('-price')
+            queryset = queryset.order_by('-precio')
         else:
             queryset = queryset.order_by('-id')
 
@@ -57,10 +56,10 @@ class ProductListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # All categories for the filter sidebar
-        context['categories'] = Category.objects.all()
-        context['sizes'] = StockBySize.objects.values_list('size', flat=True).distinct()
+        context['categories'] = Categoria.objects.all()
+        context['sizes'] = StockPorTalla.objects.values_list('talla', flat=True).distinct()
         
-        context['current_category_obj'] = self.category
+        context['current_category_obj'] = self.categoria
         context['current_sort'] = self.request.GET.get('sort', 'newest')
         context['current_min_price'] = self.request.GET.get('min_price', '')
         context['current_max_price'] = self.request.GET.get('max_price', '')
@@ -69,21 +68,21 @@ class ProductListView(ListView):
         return context
 
 class ProductDetailView(DetailView):
-    model = Product
+    model = Producto
     template_name = 'products/product_detail.html'
     context_object_name = 'product'
     slug_field = 'slug'
     slug_url_kwarg = 'slug'
 
     def get_queryset(self):
-        return Product.objects.filter()
+        return Producto.objects.filter(activo=True)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         product = self.object
-        context['inventory_items'] = product.stock_items.all()
+        context['inventory_items'] = product.stock_por_talla.all()
         # Related products based on category
-        context['related_products'] = Product.objects.filter(
-            category=product.category
+        context['related_products'] = Producto.objects.filter(
+            categoria=product.categoria, activo=True
         ).exclude(id=product.id)[:4]
         return context

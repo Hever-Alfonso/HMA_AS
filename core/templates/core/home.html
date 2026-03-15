@@ -17,8 +17,8 @@
         {% for product in featured_products %}
         <div class="product-card">
             <div class="product-image-container">
-                {% if product.image %}
-                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
+                {% if product.imagen %}
+                <img src="{{ product.imagen.url }}" alt="{{ product.nombre }}" class="product-image">
                 {% else %}
                 <!-- Placeholder if no image -->
                 <div class="product-image" style="display:flex;align-items:center;justify-content:center;color:#666;">
@@ -26,8 +26,8 @@
                 {% endif %}
             </div>
             <div class="product-info">
-                <h3 class="product-name">{{ product.name }}</h3>
-                <p class="product-price">${{ product.price }}</p>
+                <h3 class="product-name">{{ product.nombre }}</h3>
+                <p class="product-price">${{ product.precio|floatformat:"0" }}</p>
                 <a href="{% url 'products:product_detail' product.slug %}" class="btn"
                     style="padding: 8px 20px; font-size: 0.8rem;">Ver Detalles</a>
             </div>
