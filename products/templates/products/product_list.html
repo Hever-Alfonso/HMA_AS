@@ -1,5 +1,5 @@
 {% extends 'core/base.html' %}
-{% load static %}
+{% load static i18n %}
 
 {% block title %}
 {% if current_category_obj %}
@@ -12,7 +12,7 @@ Catalogo - UNLABELED
 {% block content %}
 <div class="container catalog-container">
     <aside class="catalog-filters">
-        <h3 class="filter-title">Filtros</h3>
+        <h3 class="filter-title">{% trans "Filtros" %}</h3>
 
         <form method="get" id="filterForm">
             {% if current_sort %}
@@ -21,11 +21,11 @@ Catalogo - UNLABELED
 
             <!-- Categories -->
             <div class="filter-group">
-                <h4>Categor&iacute;as</h4>
+                <h4>{% trans "Categorías" %}</h4>
                 <ul class="category-list">
                     <li>
                         <a href="{% url 'products:product_list' %}"
-                            class="{% if not current_category %}active{% endif %}">Todo</a>
+                            class="{% if not current_category %}active{% endif %}">{% trans "Todo" %}</a>
                     </li>
                     {% for cat in categories %}
                     <li>
@@ -40,18 +40,18 @@ Catalogo - UNLABELED
 
             <!-- Price -->
             <div class="filter-group">
-                <h4>Precio</h4>
+                <h4>{% trans "Precio" %}</h4>
                 <div class="price-inputs">
-                    <input type="number" name="min_price" placeholder="Min" value="{{ current_min_price }}"
+                    <input type="number" name="min_price" placeholder="{% trans 'Min' %}" value="{{ current_min_price }}"
                         class="form-control">
-                    <input type="number" name="max_price" placeholder="Max" value="{{ current_max_price }}"
+                    <input type="number" name="max_price" placeholder="{% trans 'Max' %}" value="{{ current_max_price }}"
                         class="form-control">
                 </div>
             </div>
 
             <!-- Size -->
             <div class="filter-group">
-                <h4>Talla</h4>
+                <h4>{% trans "Talla" %}</h4>
                 <div class="size-options">
                     {% for size in sizes %}
                     <label class="size-radio">
@@ -66,8 +66,8 @@ Catalogo - UNLABELED
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-filter">Aplicar Filtros</button>
-            <a href="{% url 'products:product_list' %}" class="btn-clear">Limpiar</a>
+            <button type="submit" class="btn btn-filter">{% trans "Aplicar Filtros" %}</button>
+            <a href="{% url 'products:product_list' %}" class="btn-clear">{% trans "Limpiar" %}</a>
         </form>
     </aside>
 
@@ -77,7 +77,7 @@ Catalogo - UNLABELED
                 {% if current_category_obj %}
                 {{ current_category_obj.nombre }}
                 {% else %}
-                Todos los Productos
+                {% trans "Todos los Productos" %}
                 {% endif %}
             </h2>
 
@@ -95,21 +95,21 @@ Catalogo - UNLABELED
 
                     <select name="sort" onchange="this.form.submit()" class="sort-select">
                         {% if current_sort == 'newest' %}
-                        <option value="newest" selected>Lo Nuevo</option>
+                        <option value="newest" selected>{% trans "Lo Nuevo" %}</option>
                         {% else %}
-                        <option value="newest">Lo Nuevo</option>
+                        <option value="newest">{% trans "Lo Nuevo" %}</option>
                         {% endif %}
 
                         {% if current_sort == 'price_asc' %}
-                        <option value="price_asc" selected>Precio: Menor a Mayor</option>
+                        <option value="price_asc" selected>{% trans "Precio: Menor a Mayor" %}</option>
                         {% else %}
-                        <option value="price_asc">Precio: Menor a Mayor</option>
+                        <option value="price_asc">{% trans "Precio: Menor a Mayor" %}</option>
                         {% endif %}
 
                         {% if current_sort == 'price_desc' %}
-                        <option value="price_desc" selected>Precio: Mayor a Menor</option>
+                        <option value="price_desc" selected>{% trans "Precio: Mayor a Menor" %}</option>
                         {% else %}
-                        <option value="price_desc">Precio: Mayor a Menor</option>
+                        <option value="price_desc">{% trans "Precio: Mayor a Menor" %}</option>
                         {% endif %}
                     </select>
                 </form>
@@ -126,7 +126,7 @@ Catalogo - UNLABELED
                         {% else %}
                         <div class="product-image"
                             style="display:flex;align-items:center;justify-content:center;color:#666;">
-                            Sin Imagen
+                            {% trans "Sin Imagen" %}
                         </div>
                         {% endif %}
                     </a>
@@ -134,13 +134,13 @@ Catalogo - UNLABELED
                 <div class="product-info">
                     <h3 class="product-name">{{ product.nombre }}</h3>
                     <p class="product-price">${{ product.precio|floatformat:"0" }}</p>
-                    <a href="{% url 'products:product_detail' product.slug %}" class="btn btn-sm">Ver</a>
+                    <a href="{% url 'products:product_detail' product.slug %}" class="btn btn-sm">{% trans "Ver" %}</a>
                 </div>
             </div>
             {% empty %}
             <div class="empty-state">
-                <h3>No encontramos productos con esos filtros.</h3>
-                <p>Intenta ajustar tu busqueda.</p>
+                <h3>{% trans "No encontramos productos con esos filtros." %}</h3>
+                <p>{% trans "Intenta ajustar tu busqueda." %}</p>
             </div>
             {% endfor %}
         </div>
@@ -149,14 +149,14 @@ Catalogo - UNLABELED
         <div class="pagination">
             {% if page_obj.has_previous %}
             <a href="?page={{ page_obj.previous_page_number }}{% if current_sort %}&sort={{ current_sort }}{% endif %}{% if current_min_price %}&min_price={{ current_min_price }}{% endif %}"
-                class="btn-page">&laquo; Prev</a>
+                class="btn-page">&laquo; {% trans "Anterior" %}</a>
             {% endif %}
 
-            <span class="current-page">P&aacute;gina {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+            <span class="current-page">{% blocktranslate with current=page_obj.number total=page_obj.paginator.num_pages %}Página {{ current }} de {{ total }}{% endblocktranslate %}</span>
 
             {% if page_obj.has_next %}
             <a href="?page={{ page_obj.next_page_number }}{% if current_sort %}&sort={{ current_sort }}{% endif %}{% if current_min_price %}&min_price={{ current_min_price }}{% endif %}"
-                class="btn-page">Next &raquo;</a>
+                class="btn-page">{% trans "Siguiente" %} &raquo;</a>
             {% endif %}
         </div>
         {% endif %}

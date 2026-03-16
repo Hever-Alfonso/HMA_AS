@@ -1,11 +1,11 @@
 {% extends 'core/base.html' %}
-{% load static %}
+{% load static i18n %}
 
-{% block title %}Carrito de compras - UNLABELED{% endblock %}
+{% block title %}{% trans "Carrito de compras" %} - UNLABELED{% endblock %}
 
 {% block content %}
 <section class="cart container">
-    <h1 class="section-title">Carrito de compras</h1>
+    <h1 class="section-title">{% trans "Carrito de compras" %}</h1>
 
     {% if cart_items %}
     <div class="cart-grid">
@@ -13,11 +13,11 @@
             <table class="cart-table">
                 <thead>
                     <tr>
-                        <th>Producto</th>
-                        <th>Talla</th>
-                        <th>Precio</th>
-                        <th>Cantidad</th>
-                        <th>Subtotal</th>
+                        <th>{% trans "Producto" %}</th>
+                        <th>{% trans "Talla" %}</th>
+                        <th>{% trans "Precio" %}</th>
+                        <th>{% trans "Cantidad" %}</th>
+                        <th>{% trans "Subtotal" %}</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -54,7 +54,7 @@
                                 <input type="hidden" name="product_id" value="{{ item.producto.id }}">
                                 <input type="hidden" name="size_id" value="{{ item.talla }}">
                                 <button type="submit" class="btn btn-sm btn-secondary">
-                                    Eliminar
+                                    {% trans "Eliminar" %}
                                 </button>
                             </form>
                         </td>
@@ -65,27 +65,27 @@
         </div>
 
         <aside class="cart-summary">
-            <h2>Resumen</h2>
+            <h2>{% trans "Resumen" %}</h2>
             <div class="cart-summary-line">
-                <span>Total</span>
+                <span>{% trans "Total" %}</span>
                 <span>${{ cart_total|floatformat:"0" }}</span>
             </div>
             <a href="{% url 'products:product_list' %}" class="btn btn-secondary btn-full" style="margin-top: 10px;">
-                Seguir comprando
+                {% trans "Seguir comprando" %}
             </a>
             {% if user.is_authenticated %}
             <a href="{% url 'orders:checkout' %}" class="btn btn-full" style="margin-top: 10px;">
-                Proceder al pago
+                {% trans "Proceder al pago" %}
             </a>
             {% else %}
             <a href="{% url 'accounts:login' %}" class="btn btn-full" style="margin-top: 10px;">
-                Inicia sesión para pagar
+                {% trans "Inicia sesión para pagar" %}
             </a>
             {% endif %}
         </aside>
     </div>
     {% else %}
-    <p>Tu carrito está vacío. <a href="{% url 'products:product_list' %}">Explorar productos</a></p>
+    <p>{% trans "Tu carrito está vacío." %} <a href="{% url 'products:product_list' %}">{% trans "Explorar productos" %}</a></p>
     {% endif %}
 </section>
 {% endblock %}

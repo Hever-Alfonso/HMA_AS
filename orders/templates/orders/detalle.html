@@ -1,24 +1,24 @@
 {% extends 'core/base.html' %}
-{% load static %}
+{% load static i18n %}
 
-{% block title %}Orden #{{ orden.id }} - UNLABELED{% endblock %}
+{% block title %}{% trans "Orden #" %}{{ orden.id }} - UNLABELED{% endblock %}
 
 {% block content %}
 <section class="container mt-5">
-    <h2>Orden #{{ orden.id }}</h2>
-    <p><strong>Estado:</strong> {{ orden.estado|title }}</p>
-    <p><strong>Fecha:</strong> {{ orden.fecha_orden|date:"d M Y H:i" }}</p>
-    <p><strong>Dirección Envío:</strong> {{ orden.direccion_envio }}</p>
-    <p><strong>Costo de Envío:</strong> ${{ orden.costo_envio|floatformat:"0" }}</p>
+    <h2>{% trans "Orden #" %}{{ orden.id }}</h2>
+    <p><strong>{% trans "Estado:" %}</strong> {{ orden.estado|title }}</p>
+    <p><strong>{% trans "Fecha:" %}</strong> {{ orden.fecha_orden|date:"d M Y H:i" }}</p>
+    <p><strong>{% trans "Dirección Envío:" %}</strong> {{ orden.direccion_envio }}</p>
+    <p><strong>{% trans "Costo de Envío:" %}</strong> ${{ orden.costo_envio|floatformat:"0" }}</p>
 
-    <h4>Productos</h4>
+    <h4>{% trans "Productos" %}</h4>
     <table class="table">
         <thead>
             <tr>
-                <th>Item</th>
-                <th>Talla</th>
-                <th>Cantidad</th>
-                <th>Subtotal</th>
+                <th>{% trans "Item" %}</th>
+                <th>{% trans "Talla" %}</th>
+                <th>{% trans "Cantidad" %}</th>
+                <th>{% trans "Subtotal" %}</th>
             </tr>
         </thead>
         <tbody>
@@ -33,7 +33,7 @@
         </tbody>
         <tfoot>
             <tr>
-                <th colspan="3" class="text-end">Total Pagado:</th>
+                <th colspan="3" class="text-end">{% trans "Total Pagado:" %}</th>
                 <th>${{ orden.monto_total|floatformat:"0" }}</th>
             </tr>
         </tfoot>
@@ -41,12 +41,12 @@
 
     {% if orden.estado != 'cancelada' %}
     <form method="post" action="{% url 'orders:cancelar' orden.id %}"
-        onsubmit="return confirm('¿Seguro que deseas cancelar esta orden y liberar el stock?');">
+        onsubmit="return confirm('{% trans \'¿Seguro que deseas cancelar esta orden y liberar el stock?\' %}');">
         {% csrf_token %}
-        <button type="submit" class="btn btn-danger">Cancelar Orden</button>
+        <button type="submit" class="btn btn-danger">{% trans "Cancelar Orden" %}</button>
     </form>
     {% endif %}
 
-    <a href="{% url 'products:product_list' %}" class="btn btn-primary mt-3">Seguir Comprando</a>
+    <a href="{% url 'products:product_list' %}" class="btn btn-primary mt-3">{% trans "Seguir Comprando" %}</a>
 </section>
 {% endblock %}

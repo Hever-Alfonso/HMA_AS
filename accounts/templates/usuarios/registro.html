@@ -1,11 +1,11 @@
 {% extends 'core/base.html' %}
-{% load static %}
+{% load static i18n %}
 
-{% block title %}Registro - UNLABELED{% endblock %}
+{% block title %}{% trans "Registro" %} - UNLABELED{% endblock %}
 
 {% block content %}
 <section class="container" style="max-width: 480px; margin: 60px auto;">
-    <h1 class="section-title" style="text-align:center;">Crear Cuenta</h1>
+    <h1 class="section-title" style="text-align:center;">{% trans "Crear Cuenta" %}</h1>
 
     <div id="registro-form-container">
         <form method="post" id="registro-form">
@@ -45,11 +45,11 @@
             </div>
             {% endif %}
 
-            <button type="submit" class="btn btn-full" style="width:100%; margin-top:8px;">Registrarse</button>
+            <button type="submit" class="btn btn-full" style="width:100%; margin-top:8px;">{% trans "Registrarse" %}</button>
         </form>
 
         <p style="text-align:center; margin-top:20px; color:var(--text-secondary);">
-            ¿Ya tienes cuenta? <a href="{% url 'accounts:login' %}">Inicia Sesión</a>
+            {% trans "¿Ya tienes cuenta?" %} <a href="{% url 'accounts:login' %}">{% trans "Inicia Sesión" %}</a>
         </p>
     </div>
 </section>

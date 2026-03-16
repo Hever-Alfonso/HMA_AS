@@ -13,12 +13,6 @@ class Categoria(TimestampMixin, models.Model):
     descripcion = models.TextField(blank=True)
     imagen_portada = models.ImageField(upload_to='categorias/', null=True, blank=True)
 
-    cover_image = models.ImageField(
-        upload_to='categorias/',
-        null=True,
-        blank=True
-    )
-
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.nombre)

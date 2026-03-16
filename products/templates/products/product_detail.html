@@ -1,5 +1,5 @@
 {% extends 'core/base.html' %}
-{% load static %}
+{% load static i18n %}
 
 {% block title %}{{ product.nombre }} - UNLABELED{% endblock %}
 
@@ -15,7 +15,7 @@
             </div>
             {% else %}
             <div class="product-detail-main-image placeholder">
-                <span>Sin imagen principal</span>
+                <span>{% trans "Sin imagen principal" %}</span>
             </div>
             {% endif %}
 
@@ -60,7 +60,7 @@
 
             {% if product.materials %}
             <p class="product-detail-meta">
-                <span>Materiales:</span> {{ product.materials }}
+                <span>{% trans "Materiales:" %}</span> {{ product.materials }}
             </p>
             {% endif %}
 
@@ -71,7 +71,7 @@
 
                 <!-- Tallas -->
                 <div class="product-detail-sizes">
-                    <span class="product-detail-label">Talla</span>
+                    <span class="product-detail-label">{% trans "Talla" %}</span>
                     <div class="size-chips">
                         {% for item in inventory_items %}
                         {% if item.cantidad > 0 %}
@@ -80,14 +80,14 @@
                             <span>{{ item.talla }}</span>
                         </label>
                         {% else %}
-                        <label class="size-chip size-chip-disabled" title="Agotado">
+                        <label class="size-chip size-chip-disabled" title="{% trans 'Agotado' %}">
                             <input type="radio" disabled>
                             <span>{{ item.talla }}</span>
                         </label>
                         {% endif %}
                         {% empty %}
                         <p class="product-detail-no-sizes">
-                            No hay tallas configuradas para este producto.
+                            {% trans "No hay tallas configuradas para este producto." %}
                         </p>
                         {% endfor %}
                     </div>
@@ -95,14 +95,14 @@
 
                 <!-- Cantidad -->
                 <div class="product-detail-quantity">
-                    <label for="quantity" class="product-detail-label">Cantidad</label>
+                    <label for="quantity" class="product-detail-label">{% trans "Cantidad" %}</label>
                     <input type="number" id="quantity" name="quantity" min="1" value="1">
-                    <span id="stock-display" style="font-size: 0.85rem; color: #aaa; display: block; margin-top: 8px;">Selecciona una talla para ver la disponibilidad</span>
+                    <span id="stock-display" style="font-size: 0.85rem; color: #aaa; display: block; margin-top: 8px;">{% trans "Selecciona una talla para ver la disponibilidad" %}</span>
                 </div>
 
                 <!-- Botón de carrito -->
                 <button type="submit" class="btn" style="margin-top: 1.5rem;">
-                    Agregar al carrito
+                    {% trans "Agregar al carrito" %}
                 </button>
             </form>
         </div>
@@ -110,7 +110,7 @@
 
     {% if related_products %}
     <section class="product-related">
-        <h2 class="section-title">También te puede gustar</h2>
+        <h2 class="section-title">{% trans "También te puede gustar" %}</h2>
         <div class="product-grid">
             {% for p in related_products %}
             <div class="product-card">
@@ -121,7 +121,7 @@
                         {% else %}
                         <div class="product-image"
                             style="display:flex;align-items:center;justify-content:center;color:#666;">
-                            Sin Imagen
+                            {% trans "Sin Imagen" %}
                         </div>
                         {% endif %}
                     </a>
@@ -129,7 +129,7 @@
                 <div class="product-info">
                     <h3 class="product-name">{{ p.nombre }}</h3>
                     <p class="product-price">${{ p.precio|floatformat:"0" }}</p>
-                    <a href="{% url 'products:product_detail' p.slug %}" class="btn btn-sm">Ver</a>
+                    <a href="{% url 'products:product_detail' p.slug %}" class="btn btn-sm">{% trans "Ver" %}</a>
                 </div>
             </div>
             {% endfor %}

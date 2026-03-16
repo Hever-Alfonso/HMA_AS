@@ -1,14 +1,14 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User
+from .models import Usuario
 
-@admin.register(User)
+@admin.register(Usuario)
 class CustomUserAdmin(UserAdmin):
-    model = User
-    list_display = ['username', 'email', 'fullName', 'phone', 'role', 'is_staff']
+    model = Usuario
+    list_display = ['username', 'email', 'telefono', 'rol', 'is_staff']
     fieldsets = UserAdmin.fieldsets + (
-        ('Extra Info', {'fields': ('fullName', 'phone', 'role')}),
+        ('Extra Info', {'fields': ('telefono', 'rol')}),
     )
     add_fieldsets = UserAdmin.add_fieldsets + (
-        ('Extra Info', {'fields': ('fullName', 'phone', 'role')}),
+        ('Extra Info', {'fields': ('telefono', 'rol')}),
     )

@@ -1,37 +1,37 @@
 {% extends 'core/base.html' %}
-{% load static %}
+{% load static i18n %}
 
-{% block title %}Checkout - UNLABELED{% endblock %}
+{% block title %}{% trans "Checkout" %} - UNLABELED{% endblock %}
 
 {% block content %}
 <section class="container mt-5">
-    <h2>Checkout</h2>
+    <h2>{% trans "Checkout" %}</h2>
     <div class="card p-4">
         <form method="post" action="{% url 'orders:checkout' %}">
             {% csrf_token %}
             <div class="mb-3">
-                <label for="direccion_envio" class="form-label">Dirección de Envío</label>
+                <label for="direccion_envio" class="form-label">{% trans "Dirección de Envío" %}</label>
                 <textarea class="form-control" name="direccion_envio" id="direccion_envio" rows="3" required></textarea>
             </div>
             <div class="mb-3">
-                <label for="ciudad" class="form-label">Ciudad</label>
+                <label for="ciudad" class="form-label">{% trans "Ciudad" %}</label>
                 <input type="text" class="form-control" name="ciudad" id="ciudad" required>
             </div>
             <div class="mb-3">
-                <label for="codigo_postal" class="form-label">Código Postal</label>
+                <label for="codigo_postal" class="form-label">{% trans "Código Postal" %}</label>
                 <input type="text" class="form-control" name="codigo_postal" id="codigo_postal" maxlength="10" required>
             </div>
             <div class="mb-3">
-                <label for="telefono_contacto" class="form-label">Teléfono de Contacto</label>
+                <label for="telefono_contacto" class="form-label">{% trans "Teléfono de Contacto" %}</label>
                 <input type="text" class="form-control" name="telefono_contacto" id="telefono_contacto" maxlength="15" required>
             </div>
 
             <div class="alert alert-info">
-                El costo de envío aproximado a su ubicación será calculado y sumado al total.
+                {% trans "El costo de envío aproximado a su ubicación será calculado y sumado al total." %}
             </div>
 
-            <button type="submit" class="btn btn-primary w-100">Confirmar y Pagar Orden</button>
-            <a href="{% url 'cart:detail' %}" class="btn btn-secondary w-100 mt-2">Volver al carrito</a>
+            <button type="submit" class="btn btn-primary w-100">{% trans "Confirmar y Pagar Orden" %}</button>
+            <a href="{% url 'cart:detail' %}" class="btn btn-secondary w-100 mt-2">{% trans "Volver al carrito" %}</a>
         </form>
     </div>
 </section>

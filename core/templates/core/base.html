@@ -1,4 +1,4 @@
-{% load static %}
+{% load static i18n %}
 <!DOCTYPE html>
 <html lang="es">
 
@@ -22,21 +22,37 @@
                 <a href="{% url 'core:home' %}" class="logo">UNLABELED</a>
                 <nav>
                     <ul>
-                        <li><a href="{% url 'core:home' %}">Inicio</a></li>
-                        <li><a href="{% url 'products:product_list' %}">Tienda</a></li>
-                        <li><a href="{% url 'core:about' %}">Nosotros</a></li>
-                        <li><a href="{% url 'cart:detail' %}">Carrito</a></li>
+                        <li><a href="{% url 'core:home' %}">{% trans "Inicio" %}</a></li>
+                        <li><a href="{% url 'products:product_list' %}">{% trans "Tienda" %}</a></li>
+                        <li><a href="{% url 'core:about' %}">{% trans "Nosotros" %}</a></li>
+                        <li><a href="{% url 'cart:detail' %}">{% trans "Carrito" %}</a></li>
+                        <li>
+                            <form action="{% url 'set_language' %}" method="post" style="display:inline; margin-left: 15px;">
+                                {% csrf_token %}
+                                <input name="next" type="hidden" value="{{ request.path }}">
+                                <select name="language" onchange="this.form.submit()" style="background:none; border:none; font-family:inherit; font-weight:700; font-size:13px; color:var(--text-primary); cursor:pointer;">
+                                    {% get_current_language as LANGUAGE_CODE %}
+                                    {% get_available_languages as LANGUAGES %}
+                                    {% get_language_info_list for LANGUAGES as languages %}
+                                    {% for language in languages %}
+                                        <option value="{{ language.code }}" {% if language.code == LANGUAGE_CODE %}selected{% endif %} style="color: black;">
+                                            {{ language.code|upper }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </form>
+                        </li>
                         {% if user.is_authenticated %}
-                        <li><a href="{% url 'accounts:perfil' %}">Mi Perfil</a></li>
+                        <li><a href="{% url 'accounts:perfil' %}">{% trans "Mi Perfil" %}</a></li>
                         <li>
                             <form method="post" action="{% url 'accounts:logout' %}" style="display:inline;">
                                 {% csrf_token %}
-                                <button type="submit" style="background:none; border:none; text-transform:uppercase; font-family:inherit; font-weight:700; font-size:13px; letter-spacing:2px; color:var(--text-primary); cursor:pointer; padding:0; padding-left:15px; margin-left:15px; border-left:1px solid #333;">SALIR</button>
+                                <button type="submit" style="background:none; border:none; text-transform:uppercase; font-family:inherit; font-weight:700; font-size:13px; letter-spacing:2px; color:var(--text-primary); cursor:pointer; padding:0; padding-left:15px; margin-left:15px; border-left:1px solid #333;">{% trans "SALIR" %}</button>
                             </form>
                         </li>
                         {% else %}
-                        <li><a href="{% url 'accounts:login' %}">Ingresar</a></li>
-                        <li><a href="{% url 'accounts:registro' %}">Registro</a></li>
+                        <li><a href="{% url 'accounts:login' %}">{% trans "Ingresar" %}</a></li>
+                        <li><a href="{% url 'accounts:registro' %}">{% trans "Registro" %}</a></li>
                         {% endif %}
                     </ul>
                 </nav>
@@ -63,13 +79,13 @@
             <div class="container footer-inner">
                 <span class="footer-logo">UNLABELED</span>
                 <nav class="footer-links">
-                    <a href="{% url 'core:home' %}">Inicio</a>
-                    <a href="{% url 'products:product_list' %}">Tienda</a>
-                    <a href="{% url 'core:about' %}">Nosotros</a>
-                    <a href="{% url 'cart:detail' %}">Carrito</a>
+                    <a href="{% url 'core:home' %}">{% trans "Inicio" %}</a>
+                    <a href="{% url 'products:product_list' %}">{% trans "Tienda" %}</a>
+                    <a href="{% url 'core:about' %}">{% trans "Nosotros" %}</a>
+                    <a href="{% url 'cart:detail' %}">{% trans "Carrito" %}</a>
                 </nav>
                 <div class="footer-rule"></div>
-                <p class="copyright">&copy; {% now "Y" %} UNLABELED. Todos los derechos reservados.</p>
+                <p class="copyright">&copy; {% now "Y" %} UNLABELED. {% trans "Todos los derechos reservados." %}</p>
             </div>
         </footer>
     </div>
