@@ -24,6 +24,24 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Order {self.id} - {self.userId}"
+    
+    # Shipping information
+    shippingAddress = models.TextField(blank=True)
+    city = models.CharField(max_length=100, blank=True)
+    postalCode = models.CharField(max_length=10, blank=True)
+    contactPhone = models.CharField(max_length=15, blank=True)
+
+    shippingCost = models.DecimalField(
+       max_digits=10,
+        decimal_places=2,
+       default=0
+    )
+
+    trackingNumber = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True
+    )
 
 class OrderItem(models.Model):
     orderId = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
