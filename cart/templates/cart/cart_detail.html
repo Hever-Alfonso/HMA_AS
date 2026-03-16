@@ -26,32 +26,33 @@
                     <tr>
                         <td class="cart-product">
                             <div class="cart-product-info">
-                                {% if item.product.image %}
-                                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                                {% if item.producto.imagen %}
+                                <img src="{{ item.producto.imagen.url }}" alt="{{ item.producto.nombre }}">
                                 {% endif %}
                                 <div>
-                                    <div class="cart-product-name">{{ item.product.name }}</div>
-                                    <div class="cart-product-category">{{ item.product.category.name }}</div>
+                                    <div class="cart-product-name">{{ item.producto.nombre }}</div>
+                                    <div class="cart-product-category">{{ item.producto.categoria.nombre }}</div>
                                 </div>
                             </div>
                         </td>
-                        <td>{{ item.size }}</td>
-                        <td>${{ item.unit_price }}</td>
+                        <td>{{ item.talla }}</td>
+                        <td>${{ item.precio_unitario|floatformat:"0" }}</td>
                         <td>
-                            <form action="{% url 'cart:update' %}" method="post" class="cart-quantity-form">
-                                {% csrf_token %}
-                                <input type="hidden" name="product_id" value="{{ item.product.id }}">
-                                <input type="hidden" name="size_id" value="{{ item.size }}">
-                                <input type="number" name="quantity" min="0" value="{{ item.quantity }}"
-                                    class="cart-quantity-input">
-                            </form>
+                            <!-- React Quantity Component -->
+                            <div id="qty-{{ forloop.counter }}"
+                                 data-product-id="{{ item.producto.id }}"
+                                 data-size="{{ item.talla }}"
+                                 data-quantity="{{ item.cantidad }}"
+                                 data-update-url="{% url 'cart:update' %}"
+                                 data-csrf="{{ csrf_token }}">
+                            </div>
                         </td>
-                        <td>${{ item.subtotal }}</td>
+                        <td>${{ item.subtotal|floatformat:"0" }}</td>
                         <td>
                             <form action="{% url 'cart:remove' %}" method="post">
                                 {% csrf_token %}
-                                <input type="hidden" name="product_id" value="{{ item.product.id }}">
-                                <input type="hidden" name="size_id" value="{{ item.size }}">
+                                <input type="hidden" name="product_id" value="{{ item.producto.id }}">
+                                <input type="hidden" name="size_id" value="{{ item.talla }}">
                                 <button type="submit" class="btn btn-sm btn-secondary">
                                     Eliminar
                                 </button>
@@ -67,31 +68,90 @@
             <h2>Resumen</h2>
             <div class="cart-summary-line">
                 <span>Total</span>
-                <span>${{ cart_total }}</span>
+                <span>${{ cart_total|floatformat:"0" }}</span>
             </div>
             <a href="{% url 'products:product_list' %}" class="btn btn-secondary btn-full" style="margin-top: 10px;">
                 Seguir comprando
             </a>
-            <!-- Aquí luego se enlaza a /checkout/ -->
-            <button class="btn btn-full" style="margin-top: 10px;" disabled>
-                Proceder al pago (próxima HU)
-            </button>
+            {% if user.is_authenticated %}
+            <a href="{% url 'orders:checkout' %}" class="btn btn-full" style="margin-top: 10px;">
+                Proceder al pago
+            </a>
+            {% else %}
+            <a href="{% url 'accounts:login' %}" class="btn btn-full" style="margin-top: 10px;">
+                Inicia sesión para pagar
+            </a>
+            {% endif %}
         </aside>
     </div>
     {% else %}
     <p>Tu carrito está vacío. <a href="{% url 'products:product_list' %}">Explorar productos</a></p>
     {% endif %}
 </section>
+{% endblock %}
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const qtyInputs = document.querySelectorAll('.cart-quantity-input');
+{% block extra_js %}
+{% verbatim %}
+<script type="text/babel">
+    // React Component: QuantitySelector
+    function QuantitySelector({ productId, size, initialQty, updateUrl, csrfToken }) {
+        const [quantity, setQuantity] = React.useState(initialQty);
 
-        qtyInputs.forEach(function (input) {
-            input.addEventListener('change', function () {
-                this.form.submit();
+        const handleChange = (newQty) => {
+            if (newQty < 0) return;
+            setQuantity(newQty);
+
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = updateUrl;
+
+            const fields = {
+                csrfmiddlewaretoken: csrfToken,
+                product_id: productId,
+                size_id: size,
+                quantity: newQty
+            };
+
+            Object.entries(fields).forEach(([name, value]) => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = name;
+                input.value = value;
+                form.appendChild(input);
             });
-        });
+
+            document.body.appendChild(form);
+            form.submit();
+        };
+
+        return (
+            <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                <button
+                    onClick={() => handleChange(quantity - 1)}
+                    className="qty-btn"
+                >−</button>
+                <span className="qty-display">{quantity}</span>
+                <button
+                    onClick={() => handleChange(quantity + 1)}
+                    className="qty-btn"
+                >+</button>
+            </div>
+        );
+    }
+
+    // Mount React components on each quantity container
+    document.querySelectorAll('[id^="qty-"]').forEach(container => {
+        const root = ReactDOM.createRoot(container);
+        root.render(
+            <QuantitySelector
+                productId={container.dataset.productId}
+                size={container.dataset.size}
+                initialQty={parseInt(container.dataset.quantity)}
+                updateUrl={container.dataset.updateUrl}
+                csrfToken={container.dataset.csrf}
+            />
+        );
     });
 </script>
+{% endverbatim %}
 {% endblock %}
