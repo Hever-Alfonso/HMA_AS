@@ -1,145 +1,206 @@
 {% extends 'core/base.html' %}
 {% load static i18n %}
 
-{% block title %}{% trans "Carrito de compras" %} - UNLABELED{% endblock %}
+{% block title %}{% trans "Carrito" %} — UNLABELED{% endblock %}
 
 {% block content %}
-<section class="cart container">
-    <h1 class="section-title">{% trans "Carrito de compras" %}</h1>
+<section style="padding:64px 0 96px;">
+  <div class="container" style="max-width:1000px;">
+
+    <p style="font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--fg-muted); margin-bottom:6px;">{% trans "Tu selección" %}</p>
+    <h1 style="font-size:clamp(28px,5vw,42px); font-weight:900; letter-spacing:-.02em; margin-bottom:48px;">
+      {% trans "Carrito" %}
+    </h1>
 
     {% if cart_items %}
-    <div class="cart-grid">
-        <div class="cart-items">
-            <table class="cart-table">
-                <thead>
-                    <tr>
-                        <th>{% trans "Producto" %}</th>
-                        <th>{% trans "Talla" %}</th>
-                        <th>{% trans "Precio" %}</th>
-                        <th>{% trans "Cantidad" %}</th>
-                        <th>{% trans "Subtotal" %}</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in cart_items %}
-                    <tr>
-                        <td class="cart-product">
-                            <div class="cart-product-info">
-                                {% if item.producto.imagen %}
-                                <img src="{{ item.producto.imagen.url }}" alt="{{ item.producto.nombre }}">
-                                {% endif %}
-                                <div>
-                                    <div class="cart-product-name">{{ item.producto.nombre }}</div>
-                                    <div class="cart-product-category">{{ item.producto.categoria.nombre }}</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>{{ item.talla }}</td>
-                        <td>${{ item.precio_unitario|floatformat:"0" }}</td>
-                        <td>
-                            <!-- React Quantity Component -->
-                            <div id="qty-{{ forloop.counter }}"
-                                 data-product-id="{{ item.producto.id }}"
-                                 data-size="{{ item.talla }}"
-                                 data-quantity="{{ item.cantidad }}"
-                                 data-update-url="{% url 'cart:update' %}"
-                                 data-csrf="{{ csrf_token }}">
-                            </div>
-                        </td>
-                        <td>${{ item.subtotal|floatformat:"0" }}</td>
-                        <td>
-                            <form action="{% url 'cart:remove' %}" method="post">
-                                {% csrf_token %}
-                                <input type="hidden" name="product_id" value="{{ item.producto.id }}">
-                                <input type="hidden" name="size_id" value="{{ item.talla }}">
-                                <button type="submit" class="btn btn-sm btn-secondary">
-                                    {% trans "Eliminar" %}
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <div style="display:grid; grid-template-columns:1fr 300px; gap:32px; align-items:start;">
+
+      <!-- Items -->
+      <div style="border:1px solid var(--border); border-radius:8px; overflow:hidden;">
+        <div style="padding:18px 24px; background:var(--bg-alt); border-bottom:1px solid var(--border);">
+          <p style="font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--fg-muted);">{% trans "Productos" %}</p>
         </div>
 
-        <aside class="cart-summary">
-            <h2>{% trans "Resumen" %}</h2>
-            <div class="cart-summary-line">
-                <span>{% trans "Total" %}</span>
-                <span>${{ cart_total|floatformat:"0" }}</span>
+        {% for item in cart_items %}
+        <div style="display:flex; gap:20px; align-items:center; padding:20px 24px; border-bottom:1px solid var(--border); flex-wrap:wrap;">
+
+          <!-- Imagen -->
+          <div style="flex-shrink:0; width:72px; height:72px; border:1px solid var(--border); border-radius:4px; overflow:hidden; background:var(--bg-alt);">
+            {% if item.producto.imagen %}
+            <img src="{{ item.producto.imagen.url }}" alt="{{ item.producto.nombre }}" style="width:100%; height:100%; object-fit:cover;">
+            {% endif %}
+          </div>
+
+          <!-- Info -->
+          <div style="flex:1; min-width:140px;">
+            <p style="font-weight:700; font-size:14px; margin-bottom:2px; line-height:1.3;">{{ item.producto.nombre }}</p>
+            <p style="font-size:12px; color:var(--fg-muted); margin-bottom:4px;">{{ item.producto.categoria.nombre }}</p>
+            <span style="display:inline-block; padding:2px 8px; border:1px solid var(--border-strong); border-radius:3px; font-size:11px; font-weight:700; letter-spacing:.05em;">{{ item.talla }}</span>
+          </div>
+
+          <!-- Precio unitario -->
+          <div style="text-align:right; min-width:90px;">
+            <p style="font-size:11px; color:var(--fg-faint); text-transform:uppercase; letter-spacing:.08em; margin-bottom:2px;">{% trans "Precio" %}</p>
+            <p style="font-weight:600;">${{ item.precio_unitario|floatformat:"0" }}</p>
+          </div>
+
+          <!-- Cantidad (React) -->
+          <div style="min-width:100px;">
+            <div id="qty-{{ forloop.counter }}"
+                 data-product-id="{{ item.producto.id }}"
+                 data-size="{{ item.talla }}"
+                 data-quantity="{{ item.cantidad }}"
+                 data-update-url="{% url 'cart:update' %}"
+                 data-csrf="{{ csrf_token }}">
             </div>
-            <a href="{% url 'products:product_list' %}" class="btn btn-secondary btn-full" style="margin-top: 10px;">
-                {% trans "Seguir comprando" %}
-            </a>
+          </div>
+
+          <!-- Subtotal -->
+          <div style="text-align:right; min-width:90px;">
+            <p style="font-size:11px; color:var(--fg-faint); text-transform:uppercase; letter-spacing:.08em; margin-bottom:2px;">{% trans "Subtotal" %}</p>
+            <p style="font-weight:700;">${{ item.subtotal|floatformat:"0" }}</p>
+          </div>
+
+          <!-- Eliminar -->
+          <form action="{% url 'cart:remove' %}" method="post" style="margin:0; flex-shrink:0;">
+            {% csrf_token %}
+            <input type="hidden" name="product_id" value="{{ item.producto.id }}">
+            <input type="hidden" name="size_id" value="{{ item.talla }}">
+            <button type="submit" style="
+              width:32px; height:32px; display:flex; align-items:center; justify-content:center;
+              background:transparent; border:1px solid var(--border); border-radius:4px;
+              cursor:pointer; color:var(--fg-faint); transition:all .2s;"
+              onmouseover="this.style.borderColor='#ef4444';this.style.color='#ef4444';"
+              onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--fg-faint)';"
+              title="{% trans 'Eliminar' %}">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+            </button>
+          </form>
+
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Resumen -->
+      <div style="border:1px solid var(--border); border-radius:8px; overflow:hidden; position:sticky; top:24px;">
+        <div style="padding:18px 24px; background:var(--bg-alt); border-bottom:1px solid var(--border);">
+          <p style="font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--fg-muted);">{% trans "Resumen" %}</p>
+        </div>
+        <div style="padding:24px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span style="font-size:13px; color:var(--fg-muted);">{% trans "Subtotal" %}</span>
+            <span style="font-weight:600;">${{ cart_total|floatformat:"0" }}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; padding-top:16px; border-top:1px solid var(--border); margin-top:16px;">
+            <span style="font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:.05em;">{% trans "Total" %}</span>
+            <span style="font-size:20px; font-weight:900;">${{ cart_total|floatformat:"0" }}</span>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:10px; margin-top:24px;">
             {% if user.is_authenticated %}
-            <a href="{% url 'orders:checkout' %}" class="btn btn-full" style="margin-top: 10px;">
-                {% trans "Proceder al pago" %}
+            <a href="{% url 'orders:checkout' %}" style="
+              display:block; width:100%; padding:14px; text-align:center;
+              background:var(--fg); color:var(--bg);
+              border:1px solid var(--fg); border-radius:4px;
+              font-size:12px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+              transition:all .2s;"
+              onmouseover="this.style.background='transparent';this.style.color='var(--fg)';"
+              onmouseout="this.style.background='var(--fg)';this.style.color='var(--bg)';">
+              {% trans "Proceder al Pago" %}
             </a>
             {% else %}
-            <a href="{% url 'accounts:login' %}" class="btn btn-full" style="margin-top: 10px;">
-                {% trans "Inicia sesión para pagar" %}
+            <a href="{% url 'accounts:login' %}" style="
+              display:block; width:100%; padding:14px; text-align:center;
+              background:var(--fg); color:var(--bg);
+              border:1px solid var(--fg); border-radius:4px;
+              font-size:12px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+              transition:all .2s;"
+              onmouseover="this.style.background='transparent';this.style.color='var(--fg)';"
+              onmouseout="this.style.background='var(--fg)';this.style.color='var(--bg)';">
+              {% trans "Inicia Sesión para Pagar" %}
             </a>
             {% endif %}
-        </aside>
+
+            <a href="{% url 'products:product_list' %}" style="
+              display:block; width:100%; padding:14px; text-align:center;
+              background:transparent; color:var(--fg-muted);
+              border:1px solid var(--border-strong); border-radius:4px;
+              font-size:12px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+              transition:all .2s;"
+              onmouseover="this.style.borderColor='var(--fg)';this.style.color='var(--fg)';"
+              onmouseout="this.style.borderColor='var(--border-strong)';this.style.color='var(--fg-muted)';">
+              {% trans "Seguir Comprando" %}
+            </a>
+          </div>
+        </div>
+      </div>
+
     </div>
+
     {% else %}
-    <p>{% trans "Tu carrito está vacío." %} <a href="{% url 'products:product_list' %}">{% trans "Explorar productos" %}</a></p>
+
+    <!-- Carrito vacío -->
+    <div style="text-align:center; padding:80px 24px; border:1px solid var(--border); border-radius:8px;">
+      <div style="width:64px; height:64px; border:1px solid var(--border); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 24px;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+        </svg>
+      </div>
+      <h2 style="font-weight:700; font-size:20px; margin-bottom:8px;">{% trans "Tu carrito está vacío" %}</h2>
+      <p style="color:var(--fg-muted); margin-bottom:28px;">{% trans "Descubre nuestra colección y agrega tus piezas favoritas." %}</p>
+      <a href="{% url 'products:product_list' %}" style="
+        display:inline-flex; align-items:center; gap:8px;
+        padding:13px 28px; background:var(--fg); color:var(--bg);
+        border:1px solid var(--fg); border-radius:4px;
+        font-size:12px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;">
+        {% trans "Explorar Tienda" %}
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+
     {% endif %}
+  </div>
 </section>
 {% endblock %}
 
 {% block extra_js %}
 {% verbatim %}
 <script type="text/babel">
-    // React Component: QuantitySelector
     function QuantitySelector({ productId, size, initialQty, updateUrl, csrfToken }) {
         const [quantity, setQuantity] = React.useState(initialQty);
 
         const handleChange = (newQty) => {
             if (newQty < 0) return;
             setQuantity(newQty);
-
             const form = document.createElement('form');
             form.method = 'POST';
             form.action = updateUrl;
-
-            const fields = {
-                csrfmiddlewaretoken: csrfToken,
-                product_id: productId,
-                size_id: size,
-                quantity: newQty
-            };
-
+            const fields = { csrfmiddlewaretoken: csrfToken, product_id: productId, size_id: size, quantity: newQty };
             Object.entries(fields).forEach(([name, value]) => {
                 const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = name;
-                input.value = value;
+                input.type = 'hidden'; input.name = name; input.value = value;
                 form.appendChild(input);
             });
-
             document.body.appendChild(form);
             form.submit();
         };
 
+        const btnStyle = {
+            width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: 'transparent', border: '1px solid var(--border-strong)', borderRadius: '4px',
+            cursor: 'pointer', fontFamily: 'inherit', fontSize: '16px', fontWeight: '600',
+            color: 'var(--fg)', transition: 'all .15s'
+        };
+
         return (
             <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-                <button
-                    onClick={() => handleChange(quantity - 1)}
-                    className="qty-btn"
-                >−</button>
-                <span className="qty-display">{quantity}</span>
-                <button
-                    onClick={() => handleChange(quantity + 1)}
-                    className="qty-btn"
-                >+</button>
+                <button style={btnStyle} onClick={() => handleChange(quantity - 1)}>−</button>
+                <span style={{minWidth: '24px', textAlign: 'center', fontWeight: '700', fontSize: '14px'}}>{quantity}</span>
+                <button style={btnStyle} onClick={() => handleChange(quantity + 1)}>+</button>
             </div>
         );
     }
 
-    // Mount React components on each quantity container
     document.querySelectorAll('[id^="qty-"]').forEach(container => {
         const root = ReactDOM.createRoot(container);
         root.render(

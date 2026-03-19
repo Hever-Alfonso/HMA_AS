@@ -2,164 +2,180 @@
 {% load static i18n %}
 
 {% block title %}
-{% if current_category_obj %}
-{{ current_category_obj.nombre }} - UNLABELED
-{% else %}
-Catalogo - UNLABELED
-{% endif %}
+{% if current_category_obj %}{{ current_category_obj.nombre }} — UNLABELED{% else %}{% trans "Tienda" %} — UNLABELED{% endif %}
 {% endblock %}
 
 {% block content %}
-<div class="container catalog-container">
-    <aside class="catalog-filters">
-        <h3 class="filter-title">{% trans "Filtros" %}</h3>
+<div style="display:flex; min-height:70vh;">
 
-        <form method="get" id="filterForm">
-            {% if current_sort %}
-            <input type="hidden" name="sort" value="{{ current_sort }}">
-            {% endif %}
+  <!-- Sidebar filtros -->
+  <aside style="width:220px; flex-shrink:0; border-right:1px solid var(--border); padding:48px 28px 48px 0; margin-left:24px;">
+    <p style="font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--fg-faint); margin-bottom:24px; font-weight:700;">{% trans "Filtros" %}</p>
 
-            <!-- Categories -->
-            <div class="filter-group">
-                <h4>{% trans "Categorías" %}</h4>
-                <ul class="category-list">
-                    <li>
-                        <a href="{% url 'products:product_list' %}"
-                            class="{% if not current_category %}active{% endif %}">{% trans "Todo" %}</a>
-                    </li>
-                    {% for cat in categories %}
-                    <li>
-                        <a href="{% url 'products:product_list_by_category' cat.slug %}"
-                            class="{% if current_category_obj.slug == cat.slug %}active{% endif %}">
-                            {{ cat.nombre }}
-                        </a>
-                    </li>
-                    {% endfor %}
-                </ul>
-            </div>
+    <form method="get" id="filterForm">
+      {% if current_sort %}<input type="hidden" name="sort" value="{{ current_sort }}">{% endif %}
 
-            <!-- Price -->
-            <div class="filter-group">
-                <h4>{% trans "Precio" %}</h4>
-                <div class="price-inputs">
-                    <input type="number" name="min_price" placeholder="{% trans 'Min' %}" value="{{ current_min_price }}"
-                        class="form-control">
-                    <input type="number" name="max_price" placeholder="{% trans 'Max' %}" value="{{ current_max_price }}"
-                        class="form-control">
-                </div>
-            </div>
+      <!-- Categorías -->
+      <div style="margin-bottom:32px;">
+        <p style="font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--fg-muted); margin-bottom:12px;">{% trans "Categoría" %}</p>
+        <ul style="display:flex; flex-direction:column; gap:4px;">
+          <li>
+            <a href="{% url 'products:product_list' %}" style="
+              display:block; padding:5px 0; font-size:14px; font-weight:{% if not current_category %}700{% else %}400{% endif %};
+              color:{% if not current_category %}var(--fg){% else %}var(--fg-muted){% endif %}; text-decoration:none;
+              border-bottom:{% if not current_category %}1px solid var(--fg){% else %}none{% endif %}; transition:color .15s;"
+              onmouseover="this.style.color='var(--fg)'" onmouseout="this.style.color='{% if not current_category %}var(--fg){% else %}var(--fg-muted){% endif %}'">
+              {% trans "Todo" %}
+            </a>
+          </li>
+          {% for cat in categories %}
+          <li>
+            <a href="{% url 'products:product_list_by_category' cat.slug %}" style="
+              display:block; padding:5px 0; font-size:14px; font-weight:{% if current_category_obj.slug == cat.slug %}700{% else %}400{% endif %};
+              color:{% if current_category_obj.slug == cat.slug %}var(--fg){% else %}var(--fg-muted){% endif %}; text-decoration:none;
+              border-bottom:{% if current_category_obj.slug == cat.slug %}1px solid var(--fg){% else %}none{% endif %}; transition:color .15s;"
+              onmouseover="this.style.color='var(--fg)'" onmouseout="">
+              {{ cat.nombre }}
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
 
-            <!-- Size -->
-            <div class="filter-group">
-                <h4>{% trans "Talla" %}</h4>
-                <div class="size-options">
-                    {% for size in sizes %}
-                    <label class="size-radio">
-                        {% if current_size == size %}
-                        <input type="radio" name="size" value="{{ size }}" checked onchange="this.form.submit()">
-                        {% else %}
-                        <input type="radio" name="size" value="{{ size }}" onchange="this.form.submit()">
-                        {% endif %}
-                        <span>{{ size }}</span>
-                    </label>
-                    {% endfor %}
-                </div>
-            </div>
-
-            <button type="submit" class="btn btn-filter">{% trans "Aplicar Filtros" %}</button>
-            <a href="{% url 'products:product_list' %}" class="btn-clear">{% trans "Limpiar" %}</a>
-        </form>
-    </aside>
-
-    <div class="catalog-content">
-        <div class="catalog-header">
-            <h2>
-                {% if current_category_obj %}
-                {{ current_category_obj.nombre }}
-                {% else %}
-                {% trans "Todos los Productos" %}
-                {% endif %}
-            </h2>
-
-            <div class="sort-options">
-                <form method="get">
-                    {% if current_min_price %}
-                    <input type="hidden" name="min_price" value="{{ current_min_price }}">
-                    {% endif %}
-                    {% if current_max_price %}
-                    <input type="hidden" name="max_price" value="{{ current_max_price }}">
-                    {% endif %}
-                    {% if current_size %}
-                    <input type="hidden" name="size" value="{{ current_size }}">
-                    {% endif %}
-
-                    <select name="sort" onchange="this.form.submit()" class="sort-select">
-                        {% if current_sort == 'newest' %}
-                        <option value="newest" selected>{% trans "Lo Nuevo" %}</option>
-                        {% else %}
-                        <option value="newest">{% trans "Lo Nuevo" %}</option>
-                        {% endif %}
-
-                        {% if current_sort == 'price_asc' %}
-                        <option value="price_asc" selected>{% trans "Precio: Menor a Mayor" %}</option>
-                        {% else %}
-                        <option value="price_asc">{% trans "Precio: Menor a Mayor" %}</option>
-                        {% endif %}
-
-                        {% if current_sort == 'price_desc' %}
-                        <option value="price_desc" selected>{% trans "Precio: Mayor a Menor" %}</option>
-                        {% else %}
-                        <option value="price_desc">{% trans "Precio: Mayor a Menor" %}</option>
-                        {% endif %}
-                    </select>
-                </form>
-            </div>
+      <!-- Precio -->
+      <div style="margin-bottom:32px;">
+        <p style="font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--fg-muted); margin-bottom:12px;">{% trans "Precio" %}</p>
+        <div style="display:flex; gap:8px; margin-bottom:10px;">
+          <input type="number" name="min_price" placeholder="{% trans 'Min' %}" value="{{ current_min_price }}"
+            style="width:50%; padding:8px 10px; border:1px solid var(--border-strong); border-radius:4px; background:var(--bg); color:var(--fg); font-family:inherit; font-size:13px; outline:none;"
+            onfocus="this.style.borderColor='var(--fg)'" onblur="this.style.borderColor='var(--border-strong)'">
+          <input type="number" name="max_price" placeholder="{% trans 'Max' %}" value="{{ current_max_price }}"
+            style="width:50%; padding:8px 10px; border:1px solid var(--border-strong); border-radius:4px; background:var(--bg); color:var(--fg); font-family:inherit; font-size:13px; outline:none;"
+            onfocus="this.style.borderColor='var(--fg)'" onblur="this.style.borderColor='var(--border-strong)'">
         </div>
+      </div>
 
-        <div class="product-grid">
-            {% for product in products %}
-            <div class="product-card">
-                <div class="product-image-container">
-                    <a href="{% url 'products:product_detail' product.slug %}">
-                        {% if product.imagen %}
-                        <img src="{{ product.imagen.url }}" alt="{{ product.nombre }}" class="product-image">
-                        {% else %}
-                        <div class="product-image"
-                            style="display:flex;align-items:center;justify-content:center;color:#666;">
-                            {% trans "Sin Imagen" %}
-                        </div>
-                        {% endif %}
-                    </a>
-                </div>
-                <div class="product-info">
-                    <h3 class="product-name">{{ product.nombre }}</h3>
-                    <p class="product-price">${{ product.precio|floatformat:"0" }}</p>
-                    <a href="{% url 'products:product_detail' product.slug %}" class="btn btn-sm">{% trans "Ver" %}</a>
-                </div>
-            </div>
-            {% empty %}
-            <div class="empty-state">
-                <h3>{% trans "No encontramos productos con esos filtros." %}</h3>
-                <p>{% trans "Intenta ajustar tu busqueda." %}</p>
-            </div>
-            {% endfor %}
+      <!-- Tallas -->
+      <div style="margin-bottom:32px;">
+        <p style="font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--fg-muted); margin-bottom:12px;">{% trans "Talla" %}</p>
+        <div style="display:flex; flex-wrap:wrap; gap:6px;">
+          {% for size in sizes %}
+          <label style="cursor:pointer;">
+            <input type="radio" name="size" value="{{ size }}" {% if current_size == size %}checked{% endif %} onchange="this.form.submit()" style="display:none;">
+            <span style="
+              display:inline-block; padding:5px 10px; border-radius:3px; font-size:12px; font-weight:600; letter-spacing:.04em;
+              border:1px solid {% if current_size == size %}var(--fg){% else %}var(--border-strong){% endif %};
+              background:{% if current_size == size %}var(--fg){% else %}transparent{% endif %};
+              color:{% if current_size == size %}var(--bg){% else %}var(--fg-muted){% endif %};
+              transition:all .15s; cursor:pointer;">
+              {{ size }}
+            </span>
+          </label>
+          {% endfor %}
         </div>
+      </div>
 
-        {% if is_paginated %}
-        <div class="pagination">
-            {% if page_obj.has_previous %}
-            <a href="?page={{ page_obj.previous_page_number }}{% if current_sort %}&sort={{ current_sort }}{% endif %}{% if current_min_price %}&min_price={{ current_min_price }}{% endif %}"
-                class="btn-page">&laquo; {% trans "Anterior" %}</a>
-            {% endif %}
+      <button type="submit" style="
+        width:100%; padding:10px; background:var(--fg); color:var(--bg);
+        border:1px solid var(--fg); border-radius:4px;
+        font-family:inherit; font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+        cursor:pointer; margin-bottom:8px; transition:all .2s;"
+        onmouseover="this.style.background='transparent';this.style.color='var(--fg)';"
+        onmouseout="this.style.background='var(--fg)';this.style.color='var(--bg)';">
+        {% trans "Aplicar" %}
+      </button>
+      <a href="{% url 'products:product_list' %}" style="display:block; text-align:center; font-size:12px; color:var(--fg-muted); text-decoration:underline; text-underline-offset:3px;">{% trans "Limpiar filtros" %}</a>
+    </form>
+  </aside>
 
-            <span class="current-page">{% blocktranslate with current=page_obj.number total=page_obj.paginator.num_pages %}Página {{ current }} de {{ total }}{% endblocktranslate %}</span>
+  <!-- Catálogo -->
+  <div style="flex:1; padding:48px 24px 96px 40px;">
 
-            {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}{% if current_sort %}&sort={{ current_sort }}{% endif %}{% if current_min_price %}&min_price={{ current_min_price }}{% endif %}"
-                class="btn-page">{% trans "Siguiente" %} &raquo;</a>
-            {% endif %}
-        </div>
-        {% endif %}
+    <!-- Header -->
+    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; margin-bottom:40px;">
+      <div>
+        <p style="font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--fg-muted); margin-bottom:4px;">
+          {% if current_category_obj %}{{ current_category_obj.nombre }}{% else %}{% trans "Colección" %}{% endif %}
+        </p>
+        <h1 style="font-size:clamp(22px,3.5vw,32px); font-weight:900; letter-spacing:-.02em;">
+          {% if current_category_obj %}{{ current_category_obj.nombre }}{% else %}{% trans "Todos los Productos" %}{% endif %}
+        </h1>
+      </div>
+      <form method="get" style="margin:0;">
+        {% if current_min_price %}<input type="hidden" name="min_price" value="{{ current_min_price }}">{% endif %}
+        {% if current_max_price %}<input type="hidden" name="max_price" value="{{ current_max_price }}">{% endif %}
+        {% if current_size %}<input type="hidden" name="size" value="{{ current_size }}">{% endif %}
+        <select name="sort" onchange="this.form.submit()" style="
+          padding:9px 14px; border:1px solid var(--border-strong); border-radius:4px;
+          background:var(--bg); color:var(--fg); font-family:inherit; font-size:13px; font-weight:500;
+          cursor:pointer; outline:none;">
+          <option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>{% trans "Lo Nuevo" %}</option>
+          <option value="price_asc" {% if current_sort == 'price_asc' %}selected{% endif %}>{% trans "Precio: Menor a Mayor" %}</option>
+          <option value="price_desc" {% if current_sort == 'price_desc' %}selected{% endif %}>{% trans "Precio: Mayor a Menor" %}</option>
+        </select>
+      </form>
     </div>
+
+    <!-- Grid productos -->
+    {% if products %}
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:1px; background:var(--border); border:1px solid var(--border); border-radius:8px; overflow:hidden; margin-bottom:40px;">
+      {% for product in products %}
+      <a href="{% url 'products:product_detail' product.slug %}" style="display:block; background:var(--bg); text-decoration:none; transition:background .15s;"
+         onmouseover="this.style.background='var(--bg-alt)'" onmouseout="this.style.background='var(--bg)'">
+        <div style="aspect-ratio:3/4; overflow:hidden; background:var(--bg-alt);">
+          {% if product.imagen %}
+          <img src="{{ product.imagen.url }}" alt="{{ product.nombre }}" style="width:100%; height:100%; object-fit:cover; transition:transform .4s var(--ease);"
+               onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+          {% else %}
+          <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--fg-faint);">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          </div>
+          {% endif %}
+        </div>
+        <div style="padding:14px 16px 18px;">
+          <p style="font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--fg-faint); margin-bottom:3px;">{{ product.categoria.nombre }}</p>
+          <p style="font-weight:600; font-size:13px; line-height:1.3; margin-bottom:6px;">{{ product.nombre|truncatechars:38 }}</p>
+          <p style="font-weight:900; font-size:15px;">${{ product.precio|floatformat:"0" }}</p>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+
+    {% else %}
+    <div style="padding:60px 24px; text-align:center; border:1px solid var(--border); border-radius:8px; margin-bottom:40px;">
+      <p style="font-size:16px; font-weight:700; margin-bottom:6px;">{% trans "Sin resultados" %}</p>
+      <p style="color:var(--fg-muted); margin-bottom:20px;">{% trans "Intenta ajustar tu búsqueda." %}</p>
+      <a href="{% url 'products:product_list' %}" style="font-size:13px; color:var(--fg); font-weight:600; text-decoration:underline; text-underline-offset:3px;">{% trans "Ver todos los productos" %}</a>
+    </div>
+    {% endif %}
+
+    <!-- Paginación -->
+    {% if is_paginated %}
+    <div style="display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap;">
+      {% if page_obj.has_previous %}
+      <a href="?page={{ page_obj.previous_page_number }}{% if current_sort %}&sort={{ current_sort }}{% endif %}{% if current_min_price %}&min_price={{ current_min_price }}{% endif %}" style="
+        padding:9px 16px; border:1px solid var(--border-strong); border-radius:4px;
+        font-size:13px; font-weight:600; color:var(--fg-muted); text-decoration:none; transition:all .2s;"
+        onmouseover="this.style.borderColor='var(--fg)';this.style.color='var(--fg)';"
+        onmouseout="this.style.borderColor='var(--border-strong)';this.style.color='var(--fg-muted)';">
+        ← {% trans "Anterior" %}
+      </a>
+      {% endif %}
+      <span style="padding:9px 16px; font-size:13px; color:var(--fg-muted);">
+        {% blocktranslate with current=page_obj.number total=page_obj.paginator.num_pages %}{{ current }} / {{ total }}{% endblocktranslate %}
+      </span>
+      {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}{% if current_sort %}&sort={{ current_sort }}{% endif %}{% if current_min_price %}&min_price={{ current_min_price }}{% endif %}" style="
+        padding:9px 16px; border:1px solid var(--border-strong); border-radius:4px;
+        font-size:13px; font-weight:600; color:var(--fg-muted); text-decoration:none; transition:all .2s;"
+        onmouseover="this.style.borderColor='var(--fg)';this.style.color='var(--fg)';"
+        onmouseout="this.style.borderColor='var(--border-strong)';this.style.color='var(--fg-muted)';">
+        {% trans "Siguiente" %} →
+      </a>
+      {% endif %}
+    </div>
+    {% endif %}
+
+  </div>
 </div>
 {% endblock %}

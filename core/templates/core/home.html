@@ -2,39 +2,97 @@
 {% load static i18n %}
 
 {% block content %}
-<section class="hero">
-    <div class="container">
-        <h1>UNLABELED</h1>
-        <p>{% trans "Prendas con control detallado de inventario. E-commerce B2C especializado." %}</p>
-        <a href="{% url 'products:product_list' %}" class="btn">{% trans "Explorar Colección" %}</a>
-    </div>
+
+<!-- Hero -->
+<section style="padding:120px 0 100px; border-bottom:1px solid var(--border);">
+  <div class="container">
+    <p style="font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--fg-muted); margin-bottom:20px;">{% trans "Nueva Colección" %}</p>
+    <h1 style="font-size:clamp(52px,10vw,108px); font-weight:900; letter-spacing:-.04em; line-height:1; margin-bottom:32px;">
+      UNLABELED
+    </h1>
+    <p style="font-size:17px; color:var(--fg-muted); max-width:460px; line-height:1.6; margin-bottom:48px;">
+      {% trans "Prendas que hablan por sí mismas. Manufactura premium sin logos." %}
+    </p>
+    <a href="{% url 'products:product_list' %}" style="
+      display:inline-flex; align-items:center; gap:10px;
+      padding:15px 36px; background:var(--fg); color:var(--bg);
+      border:1px solid var(--fg); border-radius:4px;
+      font-size:12px; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+      transition:all .2s;"
+      onmouseover="this.style.background='transparent';this.style.color='var(--fg)';"
+      onmouseout="this.style.background='var(--fg)';this.style.color='var(--bg)';">
+      {% trans "Explorar Colección" %}
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </a>
+  </div>
 </section>
 
-<section class="container">
-    <h2 class="section-title">{% trans "Destacados" %}</h2>
+<!-- Destacados -->
+<section style="padding:80px 0 96px;">
+  <div class="container">
 
-    <div class="product-grid">
-        {% for product in featured_products %}
-        <div class="product-card">
-            <div class="product-image-container">
-                {% if product.imagen %}
-                <img src="{{ product.imagen.url }}" alt="{{ product.nombre }}" class="product-image">
-                {% else %}
-                <!-- Placeholder if no image -->
-                <div class="product-image" style="display:flex;align-items:center;justify-content:center;color:#666;">
-                    {% trans "Sin Imagen" %}</div>
-                {% endif %}
-            </div>
-            <div class="product-info">
-                <h3 class="product-name">{{ product.nombre }}</h3>
-                <p class="product-price">${{ product.precio|floatformat:"0" }}</p>
-                <a href="{% url 'products:product_detail' product.slug %}" class="btn"
-                    style="padding: 8px 20px; font-size: 0.8rem;">{% trans "Ver Detalles" %}</a>
-            </div>
+    <div style="display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap; gap:16px; margin-bottom:48px;">
+      <div>
+        <p style="font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--fg-muted); margin-bottom:6px;">{% trans "Selección" %}</p>
+        <h2 style="font-size:clamp(24px,4vw,36px); font-weight:900; letter-spacing:-.02em;">{% trans "Destacados" %}</h2>
+      </div>
+      <a href="{% url 'products:product_list' %}" style="font-size:13px; font-weight:600; color:var(--fg-muted); text-decoration:underline; text-underline-offset:3px; transition:color .2s;"
+         onmouseover="this.style.color='var(--fg)'" onmouseout="this.style.color='var(--fg-muted)'">
+        {% trans "Ver todo" %} →
+      </a>
+    </div>
+
+    {% if featured_products %}
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:1px; background:var(--border); border:1px solid var(--border); border-radius:8px; overflow:hidden;">
+      {% for product in featured_products %}
+      <a href="{% url 'products:product_detail' product.slug %}" style="display:block; background:var(--bg); text-decoration:none; transition:background .15s;"
+         onmouseover="this.style.background='var(--bg-alt)'" onmouseout="this.style.background='var(--bg)'">
+        <div style="aspect-ratio:3/4; overflow:hidden; background:var(--bg-alt);">
+          {% if product.imagen %}
+          <img src="{{ product.imagen.url }}" alt="{{ product.nombre }}" style="width:100%; height:100%; object-fit:cover; transition:transform .4s var(--ease);"
+               onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+          {% else %}
+          <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--fg-faint);">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          </div>
+          {% endif %}
         </div>
-        {% empty %}
-        <p style="text-align: center; grid-column: 1/-1; color: var(--text-secondary);">{% trans "Próximamente: Nuevas colecciones oscuras." %}</p>
-        {% endfor %}
+        <div style="padding:16px 20px 20px;">
+          <p style="font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--fg-faint); margin-bottom:4px;">{{ product.categoria.nombre }}</p>
+          <p style="font-weight:700; font-size:14px; line-height:1.3; margin-bottom:8px;">{{ product.nombre|truncatechars:42 }}</p>
+          <p style="font-weight:900; font-size:16px;">${{ product.precio|floatformat:"0" }}</p>
+        </div>
+      </a>
+      {% endfor %}
     </div>
+
+    {% else %}
+    <div style="padding:60px 24px; text-align:center; border:1px solid var(--border); border-radius:8px;">
+      <p style="color:var(--fg-muted);">{% trans "Próximamente: Nuevas colecciones." %}</p>
+    </div>
+    {% endif %}
+
+  </div>
 </section>
+
+<!-- Banner inferior -->
+<section style="padding:80px 0; background:var(--fg); color:var(--bg);">
+  <div class="container" style="text-align:center;">
+    <p style="font-size:11px; letter-spacing:.16em; text-transform:uppercase; opacity:.5; margin-bottom:16px;">{% trans "La filosofía" %}</p>
+    <p style="font-size:clamp(20px,4vw,32px); font-weight:300; font-style:italic; line-height:1.4; max-width:600px; margin:0 auto 32px; opacity:.9;">
+      {% trans '"La identidad no se define por una marca, sino por la calidad de lo que eliges vestir."' %}
+    </p>
+    <a href="{% url 'core:about' %}" style="
+      display:inline-flex; align-items:center; gap:8px;
+      padding:13px 28px; background:transparent; color:var(--bg);
+      border:1px solid rgba(255,255,255,.35); border-radius:4px;
+      font-size:12px; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+      transition:border-color .2s;"
+      onmouseover="this.style.borderColor='rgba(255,255,255,.9)'"
+      onmouseout="this.style.borderColor='rgba(255,255,255,.35)'">
+      {% trans "Nuestra Historia" %}
+    </a>
+  </div>
+</section>
+
 {% endblock %}

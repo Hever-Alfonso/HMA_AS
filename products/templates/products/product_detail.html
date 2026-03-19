@@ -1,169 +1,214 @@
 {% extends 'core/base.html' %}
 {% load static i18n %}
 
-{% block title %}{{ product.nombre }} - UNLABELED{% endblock %}
+{% block title %}{{ product.nombre }} — UNLABELED{% endblock %}
 
 {% block content %}
-<section class="product-detail container">
-    <div class="product-detail-grid">
+<section style="padding:64px 0 80px;">
+  <div class="container">
 
-        <!-- Galería -->
-        <div class="product-detail-gallery">
-            {% if product.imagen %}
-            <div class="product-detail-main-image">
-                <img id="main-product-image" src="{{ product.imagen.url }}" alt="{{ product.nombre }}">
-            </div>
-            {% else %}
-            <div class="product-detail-main-image placeholder">
-                <span>{% trans "Sin imagen principal" %}</span>
-            </div>
-            {% endif %}
+    <!-- Breadcrumb -->
+    <p style="font-size:12px; color:var(--fg-muted); margin-bottom:40px;">
+      <a href="{% url 'products:product_list' %}" style="color:var(--fg-muted); text-decoration:none; transition:color .15s;"
+         onmouseover="this.style.color='var(--fg)'" onmouseout="this.style.color='var(--fg-muted)'">{% trans "Tienda" %}</a>
+      <span style="margin:0 8px; color:var(--fg-faint);">/</span>
+      <a href="{% url 'products:product_list_by_category' product.categoria.slug %}" style="color:var(--fg-muted); text-decoration:none; transition:color .15s;"
+         onmouseover="this.style.color='var(--fg)'" onmouseout="this.style.color='var(--fg-muted)'">{{ product.categoria.nombre }}</a>
+      <span style="margin:0 8px; color:var(--fg-faint);">/</span>
+      <span style="color:var(--fg);">{{ product.nombre|truncatechars:30 }}</span>
+    </p>
 
-            {% if product.imagenes.all %}
-            <div class="product-detail-thumbnails" style="display: flex; gap: 10px; margin-top: 15px; overflow-x: auto;">
-                {% if product.imagen %}
-                <img src="{{ product.imagen.url }}" alt="Principal" class="gallery-thumbnail active" style="width:80px; height:80px; object-fit:cover; border-radius:4px; cursor:pointer; border: 2px solid #fff; opacity: 1; transition: all 0.2s;" onclick="changeMainImage(this.src, this)">
-                {% endif %}
-                
-                {% for img in product.imagenes.all %}
-                <img src="{{ img.imagen.url }}" alt="Imagen {{ img.orden }}" class="gallery-thumbnail" style="width:80px; height:80px; object-fit:cover; border-radius:4px; cursor:pointer; border: 2px solid transparent; opacity: 0.6; transition: all 0.2s;" onclick="changeMainImage(this.src, this)">
-                {% endfor %}
-            </div>
-            
-            <script>
-                function changeMainImage(src, element) {
-                    const mainImg = document.getElementById('main-product-image');
-                    if (mainImg) mainImg.src = src;
-                    
-                    document.querySelectorAll('.gallery-thumbnail').forEach(el => {
-                        el.style.borderColor = 'transparent';
-                        el.style.opacity = '0.6';
-                    });
-                    element.style.borderColor = '#fff';
-                    element.style.opacity = '1';
-                }
-            </script>
-            {% endif %}
+    <!-- Grid principal -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:start; margin-bottom:96px;">
+
+      <!-- Galería -->
+      <div>
+        <div style="aspect-ratio:3/4; overflow:hidden; border:1px solid var(--border); border-radius:6px; background:var(--bg-alt); margin-bottom:12px;">
+          {% if product.imagen %}
+          <img id="main-product-image" src="{{ product.imagen.url }}" alt="{{ product.nombre }}"
+               style="width:100%; height:100%; object-fit:cover; transition:transform .4s var(--ease);"
+               onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
+          {% else %}
+          <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--fg-faint);">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          </div>
+          {% endif %}
         </div>
 
-        <!-- Info -->
-        <div class="product-detail-info">
-            <h1 class="product-detail-name">{{ product.nombre }}</h1>
-
-            <p class="product-detail-price">
-                ${{ product.precio|floatformat:"0" }}
-            </p>
-
-            <div class="product-detail-long">
-                {{ product.descripcion|linebreaks }}
-            </div>
-
-            {% if product.materials %}
-            <p class="product-detail-meta">
-                <span>{% trans "Materiales:" %}</span> {{ product.materials }}
-            </p>
-            {% endif %}
-
-            <!-- Formulario de carrito -->
-            <form action="{% url 'cart:add' %}" method="post" class="product-detail-form">
-                {% csrf_token %}
-                <input type="hidden" name="product_id" value="{{ product.id }}">
-
-                <!-- Tallas -->
-                <div class="product-detail-sizes">
-                    <span class="product-detail-label">{% trans "Talla" %}</span>
-                    <div class="size-chips">
-                        {% for item in inventory_items %}
-                        {% if item.cantidad > 0 %}
-                        <label class="size-chip">
-                            <input type="radio" name="size_id" value="{{ item.talla }}" data-stock="{{ item.cantidad }}" required>
-                            <span>{{ item.talla }}</span>
-                        </label>
-                        {% else %}
-                        <label class="size-chip size-chip-disabled" title="{% trans 'Agotado' %}">
-                            <input type="radio" disabled>
-                            <span>{{ item.talla }}</span>
-                        </label>
-                        {% endif %}
-                        {% empty %}
-                        <p class="product-detail-no-sizes">
-                            {% trans "No hay tallas configuradas para este producto." %}
-                        </p>
-                        {% endfor %}
-                    </div>
-                </div>
-
-                <!-- Cantidad -->
-                <div class="product-detail-quantity">
-                    <label for="quantity" class="product-detail-label">{% trans "Cantidad" %}</label>
-                    <input type="number" id="quantity" name="quantity" min="1" value="1">
-                    <span id="stock-display" style="font-size: 0.85rem; color: #aaa; display: block; margin-top: 8px;">{% trans "Selecciona una talla para ver la disponibilidad" %}</span>
-                </div>
-
-                <!-- Botón de carrito -->
-                <button type="submit" class="btn" style="margin-top: 1.5rem;">
-                    {% trans "Agregar al carrito" %}
-                </button>
-            </form>
+        {% if product.imagenes.all %}
+        <div style="display:flex; gap:8px; overflow-x:auto; padding-bottom:4px;">
+          {% if product.imagen %}
+          <img src="{{ product.imagen.url }}" alt="Principal" onclick="changeMainImage(this.src, this)"
+               style="width:72px; height:72px; object-fit:cover; border-radius:4px; cursor:pointer; border:2px solid var(--fg); flex-shrink:0; transition:all .2s;">
+          {% endif %}
+          {% for img in product.imagenes.all %}
+          <img src="{{ img.imagen.url }}" alt="Imagen {{ img.orden }}" onclick="changeMainImage(this.src, this)"
+               style="width:72px; height:72px; object-fit:cover; border-radius:4px; cursor:pointer; border:2px solid transparent; opacity:.55; flex-shrink:0; transition:all .2s;">
+          {% endfor %}
         </div>
+        <script>
+          function changeMainImage(src, el) {
+            const main = document.getElementById('main-product-image');
+            if (main) main.src = src;
+            document.querySelectorAll('.gallery-thumb').forEach(e => { e.style.borderColor='transparent'; e.style.opacity='.55'; });
+            el.style.borderColor = 'var(--fg)'; el.style.opacity = '1';
+          }
+          document.querySelectorAll('[onclick^="changeMainImage"]').forEach(el => el.classList.add('gallery-thumb'));
+        </script>
+        {% endif %}
+      </div>
+
+      <!-- Info del producto -->
+      <div style="padding-top:8px;">
+        <p style="font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--fg-muted); margin-bottom:8px;">
+          {{ product.marca.nombre }} · {{ product.categoria.nombre }}
+        </p>
+        <h1 style="font-size:clamp(22px,3vw,32px); font-weight:900; letter-spacing:-.02em; line-height:1.2; margin-bottom:20px;">
+          {{ product.nombre }}
+        </h1>
+        <p style="font-size:28px; font-weight:900; margin-bottom:28px;">
+          ${{ product.precio|floatformat:"0" }}
+        </p>
+        <div style="width:32px; height:1px; background:var(--border-strong); margin-bottom:24px;"></div>
+        <p style="font-size:15px; line-height:1.7; color:var(--fg-muted); margin-bottom:36px;">
+          {{ product.descripcion }}
+        </p>
+
+        <!-- Formulario -->
+        <form action="{% url 'cart:add' %}" method="post">
+          {% csrf_token %}
+          <input type="hidden" name="product_id" value="{{ product.id }}">
+
+          <!-- Tallas -->
+          <div style="margin-bottom:24px;">
+            <p style="font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--fg-muted); margin-bottom:12px;">{% trans "Talla" %}</p>
+            <div style="display:flex; flex-wrap:wrap; gap:8px;">
+              {% for item in inventory_items %}
+              {% if item.cantidad > 0 %}
+              <label style="cursor:pointer;">
+                <input type="radio" name="size_id" value="{{ item.talla }}" data-stock="{{ item.cantidad }}" required style="display:none;">
+                <span class="size-opt" style="
+                  display:inline-flex; align-items:center; justify-content:center;
+                  width:48px; height:48px; border:1px solid var(--border-strong); border-radius:4px;
+                  font-size:13px; font-weight:700; letter-spacing:.04em; cursor:pointer;
+                  transition:all .15s; color:var(--fg);">
+                  {{ item.talla }}
+                </span>
+              </label>
+              {% else %}
+              <span style="
+                display:inline-flex; align-items:center; justify-content:center;
+                width:48px; height:48px; border:1px solid var(--border); border-radius:4px;
+                font-size:13px; font-weight:700; color:var(--fg-faint); position:relative; overflow:hidden;">
+                {{ item.talla }}
+                <span style="position:absolute; top:50%; left:0; right:0; height:1px; background:var(--border); transform:rotate(-35deg);"></span>
+              </span>
+              {% endif %}
+              {% empty %}
+              <p style="color:var(--fg-muted); font-size:14px;">{% trans "Sin tallas disponibles." %}</p>
+              {% endfor %}
+            </div>
+            <p id="stock-display" style="font-size:12px; color:var(--fg-faint); margin-top:10px; min-height:18px;">{% trans "Selecciona una talla" %}</p>
+          </div>
+
+          <!-- Cantidad -->
+          <div style="margin-bottom:28px;">
+            <p style="font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--fg-muted); margin-bottom:12px;">{% trans "Cantidad" %}</p>
+            <div style="display:flex; align-items:center; gap:0; border:1px solid var(--border-strong); border-radius:4px; width:fit-content; overflow:hidden;">
+              <button type="button" onclick="adjustQty(-1)" style="width:40px; height:40px; background:transparent; border:none; font-size:18px; cursor:pointer; color:var(--fg); transition:background .15s;"
+                onmouseover="this.style.background='var(--bg-alt)'" onmouseout="this.style.background='transparent'">−</button>
+              <input type="number" id="quantity" name="quantity" min="1" value="1" style="width:48px; height:40px; border:none; border-left:1px solid var(--border); border-right:1px solid var(--border); text-align:center; font-family:inherit; font-size:15px; font-weight:700; background:transparent; color:var(--fg); outline:none;">
+              <button type="button" onclick="adjustQty(1)" style="width:40px; height:40px; background:transparent; border:none; font-size:18px; cursor:pointer; color:var(--fg); transition:background .15s;"
+                onmouseover="this.style.background='var(--bg-alt)'" onmouseout="this.style.background='transparent'">+</button>
+            </div>
+          </div>
+
+          <!-- Agregar al carrito -->
+          <button type="submit" style="
+            width:100%; padding:15px;
+            background:var(--fg); color:var(--bg);
+            border:1px solid var(--fg); border-radius:4px;
+            font-family:inherit; font-size:13px; font-weight:700;
+            letter-spacing:.12em; text-transform:uppercase; cursor:pointer;
+            transition:all .2s;"
+            onmouseover="this.style.background='transparent';this.style.color='var(--fg)';"
+            onmouseout="this.style.background='var(--fg)';this.style.color='var(--bg)';">
+            {% trans "Agregar al Carrito" %}
+          </button>
+        </form>
+
+      </div>
     </div>
 
+    <!-- Productos relacionados -->
     {% if related_products %}
-    <section class="product-related">
-        <h2 class="section-title">{% trans "También te puede gustar" %}</h2>
-        <div class="product-grid">
-            {% for p in related_products %}
-            <div class="product-card">
-                <div class="product-image-container">
-                    <a href="{% url 'products:product_detail' p.slug %}">
-                        {% if p.imagen %}
-                        <img src="{{ p.imagen.url }}" alt="{{ p.nombre }}" class="product-image">
-                        {% else %}
-                        <div class="product-image"
-                            style="display:flex;align-items:center;justify-content:center;color:#666;">
-                            {% trans "Sin Imagen" %}
-                        </div>
-                        {% endif %}
-                    </a>
-                </div>
-                <div class="product-info">
-                    <h3 class="product-name">{{ p.nombre }}</h3>
-                    <p class="product-price">${{ p.precio|floatformat:"0" }}</p>
-                    <a href="{% url 'products:product_detail' p.slug %}" class="btn btn-sm">{% trans "Ver" %}</a>
-                </div>
+    <div style="border-top:1px solid var(--border); padding-top:64px;">
+      <p style="font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--fg-muted); margin-bottom:6px;">{% trans "Más de" %} {{ product.categoria.nombre }}</p>
+      <h2 style="font-size:clamp(20px,3vw,28px); font-weight:900; letter-spacing:-.02em; margin-bottom:32px;">{% trans "También te puede gustar" %}</h2>
+      <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:1px; background:var(--border); border:1px solid var(--border); border-radius:8px; overflow:hidden;">
+        {% for p in related_products %}
+        <a href="{% url 'products:product_detail' p.slug %}" style="display:block; background:var(--bg); text-decoration:none; transition:background .15s;"
+           onmouseover="this.style.background='var(--bg-alt)'" onmouseout="this.style.background='var(--bg)'">
+          <div style="aspect-ratio:3/4; overflow:hidden; background:var(--bg-alt);">
+            {% if p.imagen %}
+            <img src="{{ p.imagen.url }}" alt="{{ p.nombre }}" style="width:100%; height:100%; object-fit:cover; transition:transform .4s var(--ease);"
+                 onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+            {% else %}
+            <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--fg-faint);">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
             </div>
-            {% endfor %}
-        </div>
-    </section>
+            {% endif %}
+          </div>
+          <div style="padding:14px 16px 18px;">
+            <p style="font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--fg-faint); margin-bottom:3px;">{{ p.marca.nombre }}</p>
+            <p style="font-weight:600; font-size:13px; line-height:1.3; margin-bottom:6px;">{{ p.nombre|truncatechars:38 }}</p>
+            <p style="font-weight:900; font-size:15px;">${{ p.precio|floatformat:"0" }}</p>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
     {% endif %}
+
+  </div>
 </section>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const form = document.querySelector('.product-detail-form');
-        if (!form) return;
+document.addEventListener('DOMContentLoaded', function () {
+  const form = document.querySelector('form[action*="cart"]');
+  if (!form) return;
 
-        const sizeRadios = form.querySelectorAll('input[name="size_id"]');
-        const quantityInput = document.getElementById('quantity');
-        const stockDisplay = document.getElementById('stock-display');
-
-        sizeRadios.forEach(radio => {
-            radio.addEventListener('change', function() {
-                const stock = parseInt(this.getAttribute('data-stock'), 10);
-                if (!isNaN(stock)) {
-                    stockDisplay.textContent = stock + ' unidades disponibles';
-                    stockDisplay.style.color = stock <= 3 ? '#fbbf24' : '#4ade80';
-                }
-            });
-        });
-
-        form.addEventListener('submit', function (e) {
-            const selectedSize = form.querySelector('input[name="size_id"]:checked');
-            if (!selectedSize) {
-                e.preventDefault();
-                alert('Por favor selecciona una talla antes de agregar el producto al carrito.');
-            }
-        });
+  // Selección visual de tallas
+  form.querySelectorAll('input[name="size_id"]').forEach(radio => {
+    radio.addEventListener('change', function () {
+      form.querySelectorAll('.size-opt').forEach(s => {
+        s.style.borderColor = 'var(--border-strong)';
+        s.style.background = 'transparent';
+        s.style.color = 'var(--fg)';
+      });
+      const span = this.closest('label').querySelector('.size-opt');
+      if (span) { span.style.borderColor = 'var(--fg)'; span.style.background = 'var(--fg)'; span.style.color = 'var(--bg)'; }
+      const stock = parseInt(this.getAttribute('data-stock'), 10);
+      const disp = document.getElementById('stock-display');
+      if (disp && !isNaN(stock)) {
+        disp.textContent = stock + ' {% trans "unidades disponibles" %}';
+        disp.style.color = stock <= 3 ? '#d97706' : 'var(--fg-muted)';
+      }
     });
+  });
+
+  form.addEventListener('submit', function (e) {
+    if (!form.querySelector('input[name="size_id"]:checked')) {
+      e.preventDefault();
+      alert('{% trans "Por favor selecciona una talla." %}');
+    }
+  });
+});
+
+function adjustQty(delta) {
+  const input = document.getElementById('quantity');
+  const val = parseInt(input.value) + delta;
+  if (val >= 1) input.value = val;
+}
 </script>
 {% endblock %}

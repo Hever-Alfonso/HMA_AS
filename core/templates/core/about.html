@@ -4,24 +4,76 @@
 {% block title %}{% trans "Nosotros" %} — UNLABELED{% endblock %}
 
 {% block content %}
-<section class="container" style="padding: 96px 24px; max-width: 800px;">
-    <p class="section-subtitle">{% trans "Nuestra Filosofía" %}</p>
-    <h1 class="section-title">{% trans "Minimalismo sin compromiso" %}</h1>
-    <div class="section-rule" style="margin-bottom: 48px;"></div>
 
-    <div class="about-content" style="font-size: 1.1rem; color: var(--fg-muted); line-height: 1.8;">
-        <p style="margin-bottom: 32px;">
-            {% blocktranslate %}En <strong>UNLABELED</strong>, creemos que la prenda debe hablar por sí misma. Vivimos en la intersección del arte, la música alternativa y la libertad absoluta.{% endblocktranslate %}
-        </p>
-
-        <p
-            style="margin-bottom: 32px; border-left: 2px solid var(--fg); padding-left: 24px; color: var(--fg); font-style: italic; font-size: 1.25rem;">
-            {% trans '"La identidad no se define por una marca, sino por la calidad de lo que eliges vestir."' %}
-        </p>
-
-        <p>
-            {% blocktranslate %}Nuestras colecciones son curadas detalladamente para ofrecer piezas atemporales, sin logos visibles, enfocándonos únicamente en la manufactura y los materiales premium.{% endblocktranslate %}
-        </p>
-    </div>
+<!-- Hero -->
+<section style="padding:96px 0 80px; border-bottom:1px solid var(--border);">
+  <div class="container" style="max-width:800px;">
+    <p style="font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--fg-muted); margin-bottom:12px;">{% trans "Nuestra Filosofía" %}</p>
+    <h1 style="font-size:clamp(36px,7vw,72px); font-weight:900; letter-spacing:-.03em; line-height:1.05; margin-bottom:32px;">
+      {% trans "Minimalismo" %}<br><em style="font-style:italic; font-weight:300;">{% trans "sin compromiso" %}</em>
+    </h1>
+    <div style="width:40px; height:2px; background:var(--fg);"></div>
+  </div>
 </section>
+
+<!-- Contenido -->
+<section style="padding:80px 0 96px;">
+  <div class="container" style="max-width:720px;">
+
+    <p style="font-size:18px; line-height:1.8; color:var(--fg-muted); margin-bottom:48px;">
+      {% blocktranslate %}En <strong>UNLABELED</strong>, creemos que la prenda debe hablar por sí misma. Vivimos en la intersección del arte, la música alternativa y la libertad absoluta.{% endblocktranslate %}
+    </p>
+
+    <!-- Quote -->
+    <blockquote style="margin:0 0 48px; padding:28px 32px; border-left:3px solid var(--fg); background:var(--bg-alt);">
+      <p style="font-size:20px; font-style:italic; font-weight:300; line-height:1.6; color:var(--fg); margin-bottom:0;">
+        {% trans '"La identidad no se define por una marca, sino por la calidad de lo que eliges vestir."' %}
+      </p>
+    </blockquote>
+
+    <p style="font-size:17px; line-height:1.8; color:var(--fg-muted); margin-bottom:64px;">
+      {% blocktranslate %}Nuestras colecciones son curadas detalladamente para ofrecer piezas atemporales, sin logos visibles, enfocándonos únicamente en la manufactura y los materiales premium.{% endblocktranslate %}
+    </p>
+
+    <!-- Valores -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:1px; background:var(--border); border:1px solid var(--border); border-radius:8px; overflow:hidden; margin-bottom:64px;">
+      {% with values="Calidad||Atemporalidad||Sin logos||Manufactura" %}
+      <div style="background:var(--bg); padding:28px 24px;">
+        <p style="font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--fg-faint); margin-bottom:8px;">01</p>
+        <p style="font-weight:700; font-size:15px;">{% trans "Calidad" %}</p>
+        <p style="font-size:13px; color:var(--fg-muted); margin-top:6px; line-height:1.5;">{% trans "Materiales seleccionados de primera calidad." %}</p>
+      </div>
+      <div style="background:var(--bg); padding:28px 24px;">
+        <p style="font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--fg-faint); margin-bottom:8px;">02</p>
+        <p style="font-weight:700; font-size:15px;">{% trans "Atemporalidad" %}</p>
+        <p style="font-size:13px; color:var(--fg-muted); margin-top:6px; line-height:1.5;">{% trans "Piezas que trascienden tendencias efímeras." %}</p>
+      </div>
+      <div style="background:var(--bg); padding:28px 24px;">
+        <p style="font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--fg-faint); margin-bottom:8px;">03</p>
+        <p style="font-weight:700; font-size:15px;">{% trans "Sin Logos" %}</p>
+        <p style="font-size:13px; color:var(--fg-muted); margin-top:6px; line-height:1.5;">{% trans "La prenda habla, no la etiqueta." %}</p>
+      </div>
+      <div style="background:var(--bg); padding:28px 24px;">
+        <p style="font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--fg-faint); margin-bottom:8px;">04</p>
+        <p style="font-weight:700; font-size:15px;">{% trans "Manufactura" %}</p>
+        <p style="font-size:13px; color:var(--fg-muted); margin-top:6px; line-height:1.5;">{% trans "Control detallado en cada proceso." %}</p>
+      </div>
+      {% endwith %}
+    </div>
+
+    <a href="{% url 'products:product_list' %}" style="
+      display:inline-flex; align-items:center; gap:10px;
+      padding:14px 32px; background:var(--fg); color:var(--bg);
+      border:1px solid var(--fg); border-radius:4px;
+      font-size:12px; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+      transition:all .2s;"
+      onmouseover="this.style.background='transparent';this.style.color='var(--fg)';"
+      onmouseout="this.style.background='var(--fg)';this.style.color='var(--bg)';">
+      {% trans "Explorar Colección" %}
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </a>
+
+  </div>
+</section>
+
 {% endblock %}

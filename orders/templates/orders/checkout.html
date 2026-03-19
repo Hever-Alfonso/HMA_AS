@@ -1,38 +1,103 @@
 {% extends 'core/base.html' %}
 {% load static i18n %}
 
-{% block title %}{% trans "Checkout" %} - UNLABELED{% endblock %}
+{% block title %}{% trans "Checkout" %} — UNLABELED{% endblock %}
 
 {% block content %}
-<section class="container mt-5">
-    <h2>{% trans "Checkout" %}</h2>
-    <div class="card p-4">
-        <form method="post" action="{% url 'orders:checkout' %}">
-            {% csrf_token %}
-            <div class="mb-3">
-                <label for="direccion_envio" class="form-label">{% trans "Dirección de Envío" %}</label>
-                <textarea class="form-control" name="direccion_envio" id="direccion_envio" rows="3" required></textarea>
-            </div>
-            <div class="mb-3">
-                <label for="ciudad" class="form-label">{% trans "Ciudad" %}</label>
-                <input type="text" class="form-control" name="ciudad" id="ciudad" required>
-            </div>
-            <div class="mb-3">
-                <label for="codigo_postal" class="form-label">{% trans "Código Postal" %}</label>
-                <input type="text" class="form-control" name="codigo_postal" id="codigo_postal" maxlength="10" required>
-            </div>
-            <div class="mb-3">
-                <label for="telefono_contacto" class="form-label">{% trans "Teléfono de Contacto" %}</label>
-                <input type="text" class="form-control" name="telefono_contacto" id="telefono_contacto" maxlength="15" required>
-            </div>
+<section style="padding:64px 0 96px;">
+  <div class="container" style="max-width:580px;">
 
-            <div class="alert alert-info">
-                {% trans "El costo de envío aproximado a su ubicación será calculado y sumado al total." %}
-            </div>
+    <!-- Encabezado -->
+    <p style="font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--fg-muted); margin-bottom:6px;">{% trans "Finalizar compra" %}</p>
+    <h1 style="font-size:clamp(28px,5vw,42px); font-weight:900; letter-spacing:-.02em; margin-bottom:48px;">
+      {% trans "Checkout" %}
+    </h1>
 
-            <button type="submit" class="btn btn-primary w-100">{% trans "Confirmar y Pagar Orden" %}</button>
-            <a href="{% url 'cart:detail' %}" class="btn btn-secondary w-100 mt-2">{% trans "Volver al carrito" %}</a>
-        </form>
-    </div>
+    <form method="post" action="{% url 'orders:checkout' %}">
+      {% csrf_token %}
+
+      <div style="border:1px solid var(--border); border-radius:8px; overflow:hidden; margin-bottom:24px;">
+        <div style="padding:20px 24px; background:var(--bg-alt); border-bottom:1px solid var(--border);">
+          <p style="font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--fg-muted);">{% trans "Datos de envío" %}</p>
+        </div>
+        <div style="padding:24px; display:flex; flex-direction:column; gap:20px;">
+
+          <div>
+            <label for="direccion_envio" style="display:block; font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--fg-muted); margin-bottom:8px;">
+              {% trans "Dirección de Envío" %}
+            </label>
+            <textarea name="direccion_envio" id="direccion_envio" rows="3" required
+              style="width:100%; padding:13px 16px; border:1px solid var(--border-strong); border-radius:4px; background:var(--bg); color:var(--fg); font-family:inherit; font-size:15px; outline:none; resize:vertical; transition:border-color .2s;"
+              onfocus="this.style.borderColor='var(--fg)'" onblur="this.style.borderColor='var(--border-strong)'"></textarea>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div>
+              <label for="ciudad" style="display:block; font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--fg-muted); margin-bottom:8px;">
+                {% trans "Ciudad" %}
+              </label>
+              <input type="text" name="ciudad" id="ciudad" required
+                style="width:100%; padding:13px 16px; border:1px solid var(--border-strong); border-radius:4px; background:var(--bg); color:var(--fg); font-family:inherit; font-size:15px; outline:none; transition:border-color .2s;"
+                onfocus="this.style.borderColor='var(--fg)'" onblur="this.style.borderColor='var(--border-strong)'">
+            </div>
+            <div>
+              <label for="codigo_postal" style="display:block; font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--fg-muted); margin-bottom:8px;">
+                {% trans "Código Postal" %}
+              </label>
+              <input type="text" name="codigo_postal" id="codigo_postal" maxlength="10" required
+                style="width:100%; padding:13px 16px; border:1px solid var(--border-strong); border-radius:4px; background:var(--bg); color:var(--fg); font-family:inherit; font-size:15px; outline:none; transition:border-color .2s;"
+                onfocus="this.style.borderColor='var(--fg)'" onblur="this.style.borderColor='var(--border-strong)'">
+            </div>
+          </div>
+
+          <div>
+            <label for="telefono_contacto" style="display:block; font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--fg-muted); margin-bottom:8px;">
+              {% trans "Teléfono de Contacto" %}
+            </label>
+            <input type="text" name="telefono_contacto" id="telefono_contacto" maxlength="15" required
+              style="width:100%; padding:13px 16px; border:1px solid var(--border-strong); border-radius:4px; background:var(--bg); color:var(--fg); font-family:inherit; font-size:15px; outline:none; transition:border-color .2s;"
+              onfocus="this.style.borderColor='var(--fg)'" onblur="this.style.borderColor='var(--border-strong)'">
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Nota de envío -->
+      <div style="display:flex; gap:12px; align-items:flex-start; padding:16px 20px; border:1px solid var(--border); border-radius:6px; background:var(--bg-alt); margin-bottom:28px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0; margin-top:2px; color:var(--fg-muted);">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <p style="font-size:13px; color:var(--fg-muted); line-height:1.5; margin:0;">
+          {% trans "El costo de envío aproximado a su ubicación será calculado y sumado al total." %}
+        </p>
+      </div>
+
+      <!-- Acciones -->
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <button type="submit" style="
+          width:100%; padding:15px;
+          background:var(--fg); color:var(--bg);
+          border:1px solid var(--fg); border-radius:4px;
+          font-family:inherit; font-size:12px; font-weight:700;
+          letter-spacing:.12em; text-transform:uppercase; cursor:pointer;
+          transition:all .2s;"
+          onmouseover="this.style.background='transparent';this.style.color='var(--fg)';"
+          onmouseout="this.style.background='var(--fg)';this.style.color='var(--bg)';">
+          {% trans "Confirmar y Pagar Orden" %}
+        </button>
+        <a href="{% url 'cart:detail' %}" style="
+          display:block; width:100%; padding:15px; text-align:center;
+          background:transparent; color:var(--fg-muted);
+          border:1px solid var(--border-strong); border-radius:4px;
+          font-size:12px; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+          transition:all .2s;"
+          onmouseover="this.style.borderColor='var(--fg)';this.style.color='var(--fg)';"
+          onmouseout="this.style.borderColor='var(--border-strong)';this.style.color='var(--fg-muted)';">
+          {% trans "Volver al Carrito" %}
+        </a>
+      </div>
+
+    </form>
+  </div>
 </section>
 {% endblock %}
