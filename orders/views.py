@@ -4,19 +4,22 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from .services import OrdenService
 from .models import Orden
+from .forms import CheckoutForm
 
 
 class CheckoutView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        return render(request, 'orders/checkout.html')
+        form = CheckoutForm()
+        return render(request, 'orders/checkout.html', {'form': form})
 
     def post(self, request, *args, **kwargs):
-        datos_envio = {
-            'direccion_envio': request.POST.get('direccion_envio', ''),
-            'ciudad': request.POST.get('ciudad', ''),
-            'codigo_postal': request.POST.get('codigo_postal', ''),
-            'telefono_contacto': request.POST.get('telefono_contacto', ''),
-        }
+        form = CheckoutForm(request.POST)
+
+        if not form.is_valid():
+            messages.error(request, "Por favor corrige los errores del formulario de checkout.")
+            return render(request, 'orders/checkout.html', {'form': form}, status=400)
+
+        datos_envio = form.cleaned_data
 
         try:
             orden = OrdenService.crear_desde_carrito(request.user, request, datos_envio)

@@ -28,7 +28,10 @@
             </label>
             <textarea name="direccion_envio" id="direccion_envio" rows="3" required
               style="width:100%; padding:13px 16px; border:1px solid var(--border-strong); border-radius:4px; background:var(--bg); color:var(--fg); font-family:inherit; font-size:15px; outline:none; resize:vertical; transition:border-color .2s;"
-              onfocus="this.style.borderColor='var(--fg)'" onblur="this.style.borderColor='var(--border-strong)'"></textarea>
+              onfocus="this.style.borderColor='var(--fg)'" onblur="this.style.borderColor='var(--border-strong)'">{{ form.direccion_envio.value|default:'' }}</textarea>
+            {% if form.direccion_envio.errors %}
+            <p style="margin-top:8px; font-size:12px; color:#b42318;">{{ form.direccion_envio.errors|join:", " }}</p>
+            {% endif %}
           </div>
 
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
@@ -36,17 +39,23 @@
               <label for="ciudad" style="display:block; font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--fg-muted); margin-bottom:8px;">
                 {% trans "Ciudad" %}
               </label>
-              <input type="text" name="ciudad" id="ciudad" required
+              <input type="text" name="ciudad" id="ciudad" required pattern="[A-Za-zÀ-ÿ '-]+" title="Solo letras y espacios" value="{{ form.ciudad.value|default:'' }}"
                 style="width:100%; padding:13px 16px; border:1px solid var(--border-strong); border-radius:4px; background:var(--bg); color:var(--fg); font-family:inherit; font-size:15px; outline:none; transition:border-color .2s;"
-                onfocus="this.style.borderColor='var(--fg)'" onblur="this.style.borderColor='var(--border-strong)'">
+                onfocus="this.style.borderColor='var(--fg)'" onblur="this.style.borderColor='var(--border-strong)'" oninvalid="this.setCustomValidity('Solo letras y espacios')" oninput="this.setCustomValidity('')">
+              {% if form.ciudad.errors %}
+              <p style="margin-top:8px; font-size:12px; color:#b42318;">{{ form.ciudad.errors|join:", " }}</p>
+              {% endif %}
             </div>
             <div>
               <label for="codigo_postal" style="display:block; font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--fg-muted); margin-bottom:8px;">
                 {% trans "Código Postal" %}
               </label>
-              <input type="text" name="codigo_postal" id="codigo_postal" maxlength="10" required
+              <input type="text" name="codigo_postal" id="codigo_postal" maxlength="10" required inputmode="numeric" pattern="[0-9]+" title="Solo numeros" value="{{ form.codigo_postal.value|default:'' }}"
                 style="width:100%; padding:13px 16px; border:1px solid var(--border-strong); border-radius:4px; background:var(--bg); color:var(--fg); font-family:inherit; font-size:15px; outline:none; transition:border-color .2s;"
                 onfocus="this.style.borderColor='var(--fg)'" onblur="this.style.borderColor='var(--border-strong)'">
+              {% if form.codigo_postal.errors %}
+              <p style="margin-top:8px; font-size:12px; color:#b42318;">{{ form.codigo_postal.errors|join:", " }}</p>
+              {% endif %}
             </div>
           </div>
 
@@ -54,9 +63,12 @@
             <label for="telefono_contacto" style="display:block; font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--fg-muted); margin-bottom:8px;">
               {% trans "Teléfono de Contacto" %}
             </label>
-            <input type="text" name="telefono_contacto" id="telefono_contacto" maxlength="15" required
+            <input type="text" name="telefono_contacto" id="telefono_contacto" maxlength="15" required inputmode="numeric" pattern="[0-9]+" title="Solo numeros" value="{{ form.telefono_contacto.value|default:'' }}"
               style="width:100%; padding:13px 16px; border:1px solid var(--border-strong); border-radius:4px; background:var(--bg); color:var(--fg); font-family:inherit; font-size:15px; outline:none; transition:border-color .2s;"
               onfocus="this.style.borderColor='var(--fg)'" onblur="this.style.borderColor='var(--border-strong)'">
+            {% if form.telefono_contacto.errors %}
+            <p style="margin-top:8px; font-size:12px; color:#b42318;">{{ form.telefono_contacto.errors|join:", " }}</p>
+            {% endif %}
           </div>
 
         </div>
