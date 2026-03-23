@@ -29,7 +29,13 @@ class CustomLoginView(LoginView):
         user = self.request.user
         session_cart = Cart(self.request)
         
-        db_cart, _ = Carrito.objects.get_or_create(usuario=user, estado='activo')
+        db_cart, _ = Carrito.objects.get_or_create(
+            usuario=user,
+            defaults={'estado': Carrito.EstadoCarrito.ACTIVO}
+        )
+        if db_cart.estado != Carrito.EstadoCarrito.ACTIVO:
+            db_cart.estado = Carrito.EstadoCarrito.ACTIVO
+            db_cart.save(update_fields=['estado'])
         
         for s_item in session_cart:
             db_cart.agregar_item(s_item['producto'], s_item['talla'], s_item['cantidad'])
