@@ -1,7 +1,10 @@
 from django.views.generic import ListView, DetailView
 from django.shortcuts import get_object_or_404
-from django.db.models import Q
+from django.db.models import Q, Case, When, Value, IntegerField
 from .models import Producto, StockPorTalla, Categoria, Marca
+
+
+TALLA_ORDEN = ['XS', 'S', 'M', 'L', 'XL', 'XXL']
 
 class ProductListView(ListView):
     model = Producto
@@ -80,7 +83,17 @@ class ProductDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         product = self.object
-        context['inventory_items'] = product.stock_por_talla.all()
+        talla_order_case = Case(
+            *[
+                When(talla=talla, then=Value(index))
+                for index, talla in enumerate(TALLA_ORDEN)
+            ],
+            default=Value(len(TALLA_ORDEN)),
+            output_field=IntegerField(),
+        )
+        context['inventory_items'] = product.stock_por_talla.annotate(
+            talla_order=talla_order_case
+        ).order_by('talla_order', 'id')
         # Related products based on category
         context['related_products'] = Producto.objects.filter(
             categoria=product.categoria, activo=True
