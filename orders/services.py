@@ -1,9 +1,9 @@
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from cart.cart import Cart
-from cart.models import Carrito
+from cart.db_backend import DatabaseCartBackend
 from .models import Orden, ItemOrden
-from products.models import StockPorTalla
+from products.services import InventoryService
 
 
 class MockShippingCalculator:
@@ -50,18 +50,7 @@ class OrdenService:
             talla = cart_item['talla']
             cantidad_req = cart_item['cantidad']
 
-            stock = StockPorTalla.objects.select_for_update().get(
-                producto=producto_obj,
-                talla=talla
-            )
-
-            if not stock.esta_disponible(cantidad_req):
-                raise ValueError(
-                    f"Stock insuficiente para {producto_obj.nombre} "
-                    f"talla {talla}. (Quedan {stock.cantidad})"
-                )
-
-            stock.disminuir(cantidad_req)
+            InventoryService.decrease_stock(producto_obj, talla, cantidad_req)
 
             ItemOrden.objects.create(
                 orden=orden,
@@ -77,13 +66,9 @@ class OrdenService:
 
         # 3. Limpiar sesión y BD del carrito
         session_cart.clear()
-        try:
-            carrito_db = Carrito.objects.get(usuario=usuario, estado=Carrito.EstadoCarrito.ACTIVO)
-            carrito_db.limpiar()
-            carrito_db.estado = Carrito.EstadoCarrito.CONVERTIDO
-            carrito_db.save(update_fields=['estado'])
-        except Carrito.DoesNotExist:
-            pass
+        db_cart = DatabaseCartBackend(usuario)
+        db_cart.clear()
+        db_cart.mark_converted()
 
         return orden
 
@@ -96,10 +81,6 @@ class OrdenService:
 
         # Recuperar stock bloqueando los registros
         for item in orden.items.all():
-            stock = StockPorTalla.objects.select_for_update().get(
-                producto=item.producto,
-                talla=item.talla
-            )
-            stock.aumentar(item.cantidad)
+            InventoryService.increase_stock(item.producto, item.talla, item.cantidad)
 
         orden.cancelar()

@@ -43,6 +43,13 @@ class CartSessionTest(CartTestMixin, TestCase):
         self.assertIn(f'{self.product.id}:M', self.cart.cart)
         self.assertEqual(len(self.cart), 2)
 
+    def test_agregar_producto_al_carrito_incrementa_cantidad(self):
+        self.cart.add(self.product, 'M', cantidad=1)
+        self.cart.add(self.product, 'M', cantidad=1)
+
+        item = self.cart.cart[f'{self.product.id}:M']
+        self.assertEqual(item['cantidad'], 2)
+
     def test_cart_update_remove_and_total(self):
         self.cart.add(self.product, 'M', cantidad=2)
         self.cart.update(self.product, 'M', cantidad=3)

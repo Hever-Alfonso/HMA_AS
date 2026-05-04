@@ -1,9 +1,9 @@
 from django.db import transaction
 
-from products.models import StockPorTalla
+from products.services import InventoryService
 
-from .cart import Cart
-from .models import Carrito, ItemCarrito
+from .db_backend import DatabaseCartBackend
+from .session_backend import SessionCartBackend
 
 
 class CartService:
@@ -11,38 +11,25 @@ class CartService:
 
     @staticmethod
     def validate_item(producto, talla, cantidad):
-        if not talla:
-            raise ValueError("Debes seleccionar una talla.")
-        if talla not in StockPorTalla.Talla.values:
-            raise ValueError("La talla seleccionada no es válida.")
-        if cantidad <= 0:
-            raise ValueError("La cantidad debe ser positiva.")
-
-        stock = StockPorTalla.objects.filter(producto=producto, talla=talla).first()
-        available_stock = stock.cantidad if stock else 0
-
-        if available_stock <= 0:
-            raise ValueError(f"La talla {talla} está agotada.")
-        if cantidad > available_stock:
-            raise ValueError(f"No hay suficiente stock para la talla {talla}.")
+        InventoryService.validate_available(producto, talla, cantidad)
 
     @classmethod
     def add_item(cls, request, producto, talla, cantidad):
         cls.validate_item(producto, talla, cantidad)
-        Cart(request).add(producto=producto, talla=talla, cantidad=cantidad)
+        SessionCartBackend(request.session).add_item(producto, talla, cantidad)
 
     @classmethod
     def update_item(cls, request, producto, talla, cantidad):
-        cart = Cart(request)
+        backend = SessionCartBackend(request.session)
         if cantidad <= 0:
-            cart.remove(producto=producto, talla=talla)
+            backend.remove_item(producto, talla)
             return
         cls.validate_item(producto, talla, cantidad)
-        cart.update(producto=producto, talla=talla, cantidad=cantidad)
+        backend.update_item(producto, talla, cantidad)
 
     @staticmethod
     def remove_item(request, producto, talla):
-        Cart(request).remove(producto=producto, talla=talla)
+        SessionCartBackend(request.session).remove_item(producto, talla)
 
 
 class CartMergeService:
@@ -51,39 +38,28 @@ class CartMergeService:
     @staticmethod
     @transaction.atomic
     def merge_session_into_db(request, user):
-        session_cart = Cart(request)
-        db_cart, _ = Carrito.objects.get_or_create(
-            usuario=user,
-            defaults={'estado': Carrito.EstadoCarrito.ACTIVO},
-        )
-
-        if db_cart.estado != Carrito.EstadoCarrito.ACTIVO:
-            db_cart.estado = Carrito.EstadoCarrito.ACTIVO
-            db_cart.save(update_fields=['estado'])
+        session_backend = SessionCartBackend(request.session)
+        db_backend = DatabaseCartBackend(user)
 
         existing_keys = {
-            f"{item.producto_id}:{item.talla}"
-            for item in db_cart.items.select_related('producto')
+            item['key']
+            for item in db_backend.get_items()
         }
 
-        for session_item in session_cart:
-            key = f"{session_item['producto'].id}:{session_item['talla']}"
-            if key in existing_keys:
+        for session_item in session_backend.get_items():
+            if session_item['key'] in existing_keys:
                 continue
 
-            ItemCarrito.objects.create(
-                carrito=db_cart,
-                producto=session_item['producto'],
-                talla=session_item['talla'],
-                cantidad=session_item['cantidad'],
-                precio_unitario=session_item['precio_unitario'],
+            db_backend.add_item(
+                session_item['producto'],
+                session_item['talla'],
+                session_item['cantidad'],
             )
 
-        session_cart.clear()
-        for db_item in db_cart.items.select_related('producto'):
-            session_cart.add(
-                db_item.producto,
-                db_item.talla,
-                cantidad=db_item.cantidad,
-                override_cantidad=True,
+        session_backend.clear()
+        for db_item in db_backend.get_items():
+            session_backend.set_item(
+                db_item['producto'],
+                db_item['talla'],
+                db_item['cantidad'],
             )

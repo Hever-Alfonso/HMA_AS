@@ -5,6 +5,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from .models import Categoria, Marca, Producto, StockPorTalla
+from .repositories import ProductoRepository
 
 
 class ProductTestMixin:
@@ -117,6 +118,24 @@ class ProductCatalogTest(ProductTestMixin, TestCase):
         products = list(response.context['products'])
         self.assertIn(self.product, products)
         self.assertNotIn(other_product, products)
+
+    def test_filtro_por_talla_solo_muestra_productos_con_stock(self):
+        _, _, no_stock_product = self.create_base_product(
+            name='No Stock Product',
+            slug='no-stock-product',
+        )
+        StockPorTalla.objects.create(producto=no_stock_product, talla='M', cantidad=0)
+        _, _, other_size_product = self.create_base_product(
+            name='Other Size Product',
+            slug='other-size-product',
+        )
+        StockPorTalla.objects.create(producto=other_size_product, talla='L', cantidad=4)
+
+        products = list(ProductoRepository().buscar(talla='M'))
+
+        self.assertIn(self.product, products)
+        self.assertNotIn(no_stock_product, products)
+        self.assertNotIn(other_size_product, products)
 
     def test_product_detail_shows_ordered_stock(self):
         StockPorTalla.objects.create(producto=self.product, talla='XS', cantidad=1)
