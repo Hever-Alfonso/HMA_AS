@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import transaction
 from cart.cart import Cart
 from cart.models import Carrito
@@ -38,6 +39,10 @@ class OrdenService:
             telefono_contacto=datos_envio.get('telefono_contacto', ''),
             costo_envio=costo_envio,
         )
+        try:
+            orden.full_clean()
+        except ValidationError as exc:
+            raise ValueError("Los datos de envío no son válidos.") from exc
 
         # 2. Validar stock y crear items atómicamente
         for cart_item in session_cart:
