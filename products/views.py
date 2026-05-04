@@ -1,10 +1,13 @@
-from django.views.generic import ListView, DetailView
+from django.db.models import Case, IntegerField, Value, When
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from django.db.models import Q, Case, When, Value, IntegerField
-from .models import Producto, StockPorTalla, Categoria, Marca
+from django.views import View
+from django.views.generic import DetailView, ListView
 
+from .constants import SIZE_ORDER
+from .models import Categoria, Producto, StockPorTalla
+from .repositories import ProductoRepository
 
-TALLA_ORDEN = ['XS', 'S', 'M', 'L', 'XL', 'XXL']
 
 class ProductListView(ListView):
     model = Producto
@@ -13,54 +16,31 @@ class ProductListView(ListView):
     paginate_by = 12
 
     def get_queryset(self):
-        queryset = Producto.objects.filter(activo=True)
+        repository = ProductoRepository()
         self.categoria = None
-        
-        category_slug = self.kwargs.get('category_slug')
+        category_slug = self.kwargs.get('category_slug') or self.request.GET.get('category')
+
         if category_slug:
             self.categoria = get_object_or_404(Categoria, slug=category_slug)
-            queryset = queryset.filter(categoria=self.categoria)
-        
-        # Keyword Search
-        query = self.request.GET.get('q')
-        if query:
-            queryset = queryset.filter(
-                Q(nombre__icontains=query) | 
-                Q(descripcion__icontains=query)
-            )
 
-        # Price Filter
-        min_price = self.request.GET.get('min_price')
-        max_price = self.request.GET.get('max_price')
-        if min_price:
-            queryset = queryset.filter(precio__gte=min_price)
-        if max_price:
-            queryset = queryset.filter(precio__lte=max_price)
-
-        # Size Filter
-        size_name = self.request.GET.get('size')
-        if size_name:
-            queryset = queryset.filter(
-                stock_por_talla__talla=size_name,
-                stock_por_talla__cantidad__gt=0
-            ).distinct()
-
-        # Sorting
-        sort = self.request.GET.get('sort')
-        if sort == 'price_asc':
-            queryset = queryset.order_by('precio')
-        elif sort == 'price_desc':
-            queryset = queryset.order_by('-precio')
-        else:
-            queryset = queryset.order_by('-id')
-
-        return queryset
+        return repository.buscar(
+            query=self.request.GET.get('q'),
+            categoria=category_slug,
+            precio_min=self.request.GET.get('min_price'),
+            precio_max=self.request.GET.get('max_price'),
+            talla=self.request.GET.get('size'),
+            sort=self.request.GET.get('sort'),
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # All categories for the filter sidebar
         context['categories'] = Categoria.objects.all()
-        context['sizes'] = StockPorTalla.objects.values_list('talla', flat=True).distinct()
+        available_sizes = StockPorTalla.objects.values_list('talla', flat=True).distinct()
+        context['sizes'] = [
+            size for size in SIZE_ORDER
+            if size in set(available_sizes)
+        ]
         
         context['current_category_obj'] = self.categoria
         context['current_sort'] = self.request.GET.get('sort', 'newest')
@@ -78,7 +58,11 @@ class ProductDetailView(DetailView):
     slug_url_kwarg = 'slug'
 
     def get_queryset(self):
-        return Producto.objects.filter(activo=True)
+        return Producto.activos.select_related(
+            'marca', 'categoria'
+        ).prefetch_related(
+            'stock_por_talla', 'imagenes'
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -86,9 +70,9 @@ class ProductDetailView(DetailView):
         talla_order_case = Case(
             *[
                 When(talla=talla, then=Value(index))
-                for index, talla in enumerate(TALLA_ORDEN)
+                for index, talla in enumerate(SIZE_ORDER)
             ],
-            default=Value(len(TALLA_ORDEN)),
+            default=Value(len(SIZE_ORDER)),
             output_field=IntegerField(),
         )
         context['inventory_items'] = product.stock_por_talla.annotate(
@@ -97,5 +81,79 @@ class ProductDetailView(DetailView):
         # Related products based on category
         context['related_products'] = Producto.objects.filter(
             categoria=product.categoria, activo=True
+        ).select_related('marca', 'categoria').prefetch_related(
+            'imagenes', 'stock_por_talla'
         ).exclude(id=product.id)[:4]
         return context
+
+
+class ProductApiListView(View):
+    def get(self, request, *args, **kwargs):
+        repository = ProductoRepository()
+        products = repository.buscar(
+            query=request.GET.get('q'),
+            categoria=request.GET.get('category'),
+            precio_min=request.GET.get('min_price'),
+            precio_max=request.GET.get('max_price'),
+            talla=request.GET.get('size'),
+            sort=request.GET.get('sort'),
+        )
+
+        data = [
+            {
+                'id': product.id,
+                'name': product.nombre,
+                'slug': product.slug,
+                'price': str(product.precio),
+                'brand': product.marca.nombre,
+                'category': product.categoria.nombre,
+                'image': product.imagen.url if product.imagen else None,
+            }
+            for product in products
+        ]
+        return JsonResponse({'results': data})
+
+
+class ProductApiDetailView(View):
+    def get(self, request, slug, *args, **kwargs):
+        repository = ProductoRepository()
+        try:
+            product = repository.obtener_activo_por_slug(slug)
+        except Producto.DoesNotExist:
+            return JsonResponse({'detail': 'Producto no encontrado.'}, status=404)
+
+        stock_items = sorted(
+            product.stock_por_talla.all(),
+            key=lambda item: SIZE_ORDER.index(item.talla)
+            if item.talla in SIZE_ORDER
+            else len(SIZE_ORDER),
+        )
+        data = {
+            'id': product.id,
+            'name': product.nombre,
+            'slug': product.slug,
+            'description': product.descripcion,
+            'price': str(product.precio),
+            'brand': {
+                'name': product.marca.nombre,
+                'slug': product.marca.slug,
+            },
+            'category': {
+                'name': product.categoria.nombre,
+                'slug': product.categoria.slug,
+            },
+            'image': product.imagen.url if product.imagen else None,
+            'stock_by_size': [
+                {'size': item.talla, 'quantity': item.cantidad}
+                for item in stock_items
+            ],
+            'images': [
+                {
+                    'url': image.imagen.url,
+                    'order': image.orden,
+                    'is_main': image.es_principal,
+                }
+                for image in product.imagenes.all()
+            ],
+        }
+        return JsonResponse(data)
