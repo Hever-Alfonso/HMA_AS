@@ -22,403 +22,516 @@ msgstr ""
 #: accounts/templates/usuarios/login.html:8
 #: accounts/templates/usuarios/login.html:45
 msgid "Iniciar Sesión"
-msgstr ""
+msgstr "Iniciar Sesión"
 
 #: accounts/templates/usuarios/login.html:49
 msgid "¿No tienes cuenta?"
-msgstr ""
+msgstr "¿No tienes cuenta?"
 
 #: accounts/templates/usuarios/login.html:49
 msgid "Regístrate"
-msgstr ""
+msgstr "Regístrate"
 
 #: accounts/templates/usuarios/perfil.html:4
 #: accounts/templates/usuarios/perfil.html:8 core/templates/core/base.html:46
 msgid "Mi Perfil"
-msgstr ""
+msgstr "Mi Perfil"
 
 #: accounts/templates/usuarios/perfil.html:12
 msgid "Usuario:"
-msgstr ""
+msgstr "Usuario:"
 
 #: accounts/templates/usuarios/perfil.html:16
 msgid "Email:"
-msgstr ""
+msgstr "Email:"
 
 #: accounts/templates/usuarios/perfil.html:20
 msgid "Nombre:"
-msgstr ""
+msgstr "Nombre:"
 
 #: accounts/templates/usuarios/perfil.html:24
 msgid "Teléfono:"
-msgstr ""
+msgstr "Teléfono:"
 
 #: accounts/templates/usuarios/perfil.html:25
 msgid "No registrado"
-msgstr ""
+msgstr "No registrado"
 
 #: accounts/templates/usuarios/perfil.html:28
 msgid "Rol:"
-msgstr ""
+msgstr "Rol:"
 
 #: accounts/templates/usuarios/perfil.html:32
 msgid "Miembro desde:"
-msgstr ""
+msgstr "Miembro desde:"
 
 #: accounts/templates/usuarios/perfil.html:38
 msgid "Mis Órdenes Recientes"
-msgstr ""
+msgstr "Mis Órdenes Recientes"
 
 #: accounts/templates/usuarios/perfil.html:45
 #: orders/templates/orders/detalle.html:4
 #: orders/templates/orders/detalle.html:8
 msgid "Orden #"
-msgstr ""
+msgstr "Orden #"
 
 #: accounts/templates/usuarios/perfil.html:58
 msgid "Aún no has realizado ninguna orden."
-msgstr ""
+msgstr "Aún no has realizado ninguna orden."
 
 #: accounts/templates/usuarios/perfil.html:58
 #: cart/templates/cart/cart_detail.html:88
 msgid "Explorar productos"
-msgstr ""
+msgstr "Explorar productos"
 
 #: accounts/templates/usuarios/perfil.html:64
 msgid "Cerrar Sesión"
-msgstr ""
+msgstr "Cerrar Sesión"
 
 #: accounts/templates/usuarios/registro.html:4 core/templates/core/base.html:55
 msgid "Registro"
-msgstr ""
+msgstr "Registro"
 
 #: accounts/templates/usuarios/registro.html:8
 msgid "Crear Cuenta"
-msgstr ""
+msgstr "Crear Cuenta"
 
 #: accounts/templates/usuarios/registro.html:48
 msgid "Registrarse"
-msgstr ""
+msgstr "Registrarse"
 
 #: accounts/templates/usuarios/registro.html:52
 msgid "¿Ya tienes cuenta?"
-msgstr ""
+msgstr "¿Ya tienes cuenta?"
 
 #: accounts/templates/usuarios/registro.html:52
 msgid "Inicia Sesión"
-msgstr ""
+msgstr "Inicia Sesión"
 
 #: cart/templates/cart/cart_detail.html:4
 #: cart/templates/cart/cart_detail.html:8
 msgid "Carrito de compras"
-msgstr ""
+msgstr "Carrito de compras"
 
 #: cart/templates/cart/cart_detail.html:16
 msgid "Producto"
-msgstr ""
+msgstr "Producto"
 
 #: cart/templates/cart/cart_detail.html:17
 #: orders/templates/orders/detalle.html:19
 #: products/templates/products/product_detail.html:74
 #: products/templates/products/product_list.html:54
 msgid "Talla"
-msgstr ""
+msgstr "Talla"
 
 #: cart/templates/cart/cart_detail.html:18
 #: products/templates/products/product_list.html:43
 msgid "Precio"
-msgstr ""
+msgstr "Precio"
 
 #: cart/templates/cart/cart_detail.html:19
 #: orders/templates/orders/detalle.html:20
 #: products/templates/products/product_detail.html:98
 msgid "Cantidad"
-msgstr ""
+msgstr "Cantidad"
 
 #: cart/templates/cart/cart_detail.html:20
 #: orders/templates/orders/detalle.html:21
 msgid "Subtotal"
-msgstr ""
+msgstr "Subtotal"
 
 #: cart/templates/cart/cart_detail.html:57
 msgid "Eliminar"
-msgstr ""
+msgstr "Eliminar"
 
 #: cart/templates/cart/cart_detail.html:68
 msgid "Resumen"
-msgstr ""
+msgstr "Resumen"
 
 #: cart/templates/cart/cart_detail.html:70
 msgid "Total"
-msgstr ""
+msgstr "Total"
 
 #: cart/templates/cart/cart_detail.html:74
 msgid "Seguir comprando"
-msgstr ""
+msgstr "Seguir comprando"
 
 #: cart/templates/cart/cart_detail.html:78
 msgid "Proceder al pago"
-msgstr ""
+msgstr "Proceder al pago"
 
 #: cart/templates/cart/cart_detail.html:82
 msgid "Inicia sesión para pagar"
-msgstr ""
+msgstr "Inicia sesión para pagar"
 
 #: cart/templates/cart/cart_detail.html:88
 msgid "Tu carrito está vacío."
-msgstr ""
+msgstr "Tu carrito está vacío."
 
 #: core/templates/core/about.html:4 core/templates/core/base.html:27
 #: core/templates/core/base.html:84
 msgid "Nosotros"
-msgstr ""
+msgstr "Nosotros"
 
 #: core/templates/core/about.html:8
 msgid "Nuestra Filosofía"
-msgstr ""
+msgstr "Nuestra Filosofía"
 
 #: core/templates/core/about.html:9
 msgid "Minimalismo sin compromiso"
-msgstr ""
+msgstr "Minimalismo sin compromiso"
 
 #: core/templates/core/about.html:14
 msgid ""
 "En <strong>UNLABELED</strong>, creemos que la prenda debe hablar por sí "
 "misma. Vivimos en la intersección del arte, la música alternativa y la "
 "libertad absoluta."
-msgstr ""
+msgstr "En <strong>UNLABELED</strong>, creemos que la prenda debe hablar por sí misma. Vivimos en la intersección del arte, la música alternativa y la libertad absoluta."
 
 #: core/templates/core/about.html:19
 msgid ""
 "\"La identidad no se define por una marca, sino por la calidad de lo que "
 "eliges vestir.\""
-msgstr ""
+msgstr "\"La identidad no se define por una marca, sino por la calidad de lo que eliges vestir.\""
 
 #: core/templates/core/about.html:23
 msgid ""
 "Nuestras colecciones son curadas detalladamente para ofrecer piezas "
 "atemporales, sin logos visibles, enfocándonos únicamente en la manufactura y "
 "los materiales premium."
-msgstr ""
+msgstr "Nuestras colecciones son curadas detalladamente para ofrecer piezas atemporales, sin logos visibles, enfocándonos únicamente en la manufactura y los materiales premium."
 
 #: core/templates/core/base.html:25 core/templates/core/base.html:82
 msgid "Inicio"
-msgstr ""
+msgstr "Inicio"
 
 #: core/templates/core/base.html:26 core/templates/core/base.html:83
 msgid "Tienda"
-msgstr ""
+msgstr "Tienda"
 
 #: core/templates/core/base.html:28 core/templates/core/base.html:85
 msgid "Carrito"
-msgstr ""
+msgstr "Carrito"
 
 #: core/templates/core/base.html:50
 msgid "SALIR"
-msgstr ""
+msgstr "SALIR"
 
 #: core/templates/core/base.html:54
 msgid "Ingresar"
-msgstr ""
+msgstr "Ingresar"
 
 #: core/templates/core/base.html:88
 msgid "Todos los derechos reservados."
-msgstr ""
+msgstr "Todos los derechos reservados."
 
 #: core/templates/core/home.html:8
 msgid ""
 "Prendas con control detallado de inventario. E-commerce B2C especializado."
-msgstr ""
+msgstr "Prendas con control detallado de inventario. E-commerce B2C especializado."
 
 #: core/templates/core/home.html:9
 msgid "Explorar Colección"
-msgstr ""
+msgstr "Explorar Colección"
 
 #: core/templates/core/home.html:14
 msgid "Destacados"
-msgstr ""
+msgstr "Destacados"
 
 #: core/templates/core/home.html:25
 #: products/templates/products/product_detail.html:124
 #: products/templates/products/product_list.html:129
 msgid "Sin Imagen"
-msgstr ""
+msgstr "Sin Imagen"
 
 #: core/templates/core/home.html:32
 msgid "Ver Detalles"
-msgstr ""
+msgstr "Ver Detalles"
 
 #: core/templates/core/home.html:36
 msgid "Próximamente: Nuevas colecciones oscuras."
-msgstr ""
+msgstr "Próximamente: Nuevas colecciones oscuras."
 
 #: orders/templates/orders/checkout.html:4
 #: orders/templates/orders/checkout.html:8
 msgid "Checkout"
-msgstr ""
+msgstr "Checkout"
 
 #: orders/templates/orders/checkout.html:13
 msgid "Dirección de Envío"
-msgstr ""
+msgstr "Dirección de Envío"
 
 #: orders/templates/orders/checkout.html:17
 msgid "Ciudad"
-msgstr ""
+msgstr "Ciudad"
 
 #: orders/templates/orders/checkout.html:21
 msgid "Código Postal"
-msgstr ""
+msgstr "Código Postal"
 
 #: orders/templates/orders/checkout.html:25
 msgid "Teléfono de Contacto"
-msgstr ""
+msgstr "Teléfono de Contacto"
 
 #: orders/templates/orders/checkout.html:30
 msgid ""
 "El costo de envío aproximado a su ubicación será calculado y sumado al total."
-msgstr ""
+msgstr "El costo de envío aproximado a su ubicación será calculado y sumado al total."
 
 #: orders/templates/orders/checkout.html:33
 msgid "Confirmar y Pagar Orden"
-msgstr ""
+msgstr "Confirmar y Pagar Orden"
 
 #: orders/templates/orders/checkout.html:34
 msgid "Volver al carrito"
-msgstr ""
+msgstr "Volver al carrito"
 
 #: orders/templates/orders/detalle.html:9
 msgid "Estado:"
-msgstr ""
+msgstr "Estado:"
 
 #: orders/templates/orders/detalle.html:10
 msgid "Fecha:"
-msgstr ""
+msgstr "Fecha:"
 
 #: orders/templates/orders/detalle.html:11
 msgid "Dirección Envío:"
-msgstr ""
+msgstr "Dirección Envío:"
 
 #: orders/templates/orders/detalle.html:12
 msgid "Costo de Envío:"
-msgstr ""
+msgstr "Costo de Envío:"
 
 #: orders/templates/orders/detalle.html:14
 msgid "Productos"
-msgstr ""
+msgstr "Productos"
 
 #: orders/templates/orders/detalle.html:18
 msgid "Item"
-msgstr ""
+msgstr "Item"
 
 #: orders/templates/orders/detalle.html:36
 msgid "Total Pagado:"
-msgstr ""
+msgstr "Total Pagado:"
 
 #: orders/templates/orders/detalle.html:46
 msgid "Cancelar Orden"
-msgstr ""
+msgstr "Cancelar Orden"
 
 #: orders/templates/orders/detalle.html:50
 msgid "Seguir Comprando"
-msgstr ""
+msgstr "Seguir Comprando"
 
 #: products/templates/products/product_detail.html:18
 msgid "Sin imagen principal"
-msgstr ""
+msgstr "Sin imagen principal"
 
 #: products/templates/products/product_detail.html:63
 msgid "Materiales:"
-msgstr ""
+msgstr "Materiales:"
 
 #: products/templates/products/product_detail.html:83
 msgid "Agotado"
-msgstr ""
+msgstr "Agotado"
 
 #: products/templates/products/product_detail.html:90
 msgid "No hay tallas configuradas para este producto."
-msgstr ""
+msgstr "No hay tallas configuradas para este producto."
 
 #: products/templates/products/product_detail.html:100
 msgid "Selecciona una talla para ver la disponibilidad"
-msgstr ""
+msgstr "Selecciona una talla para ver la disponibilidad"
 
 #: products/templates/products/product_detail.html:105
 msgid "Agregar al carrito"
-msgstr ""
+msgstr "Agregar al carrito"
 
 #: products/templates/products/product_detail.html:113
 msgid "También te puede gustar"
-msgstr ""
+msgstr "También te puede gustar"
 
 #: products/templates/products/product_detail.html:132
 #: products/templates/products/product_list.html:137
 msgid "Ver"
-msgstr ""
+msgstr "Ver"
 
 #: products/templates/products/product_list.html:15
 msgid "Filtros"
-msgstr ""
+msgstr "Filtros"
 
 #: products/templates/products/product_list.html:24
 msgid "Categorías"
-msgstr ""
+msgstr "Categorías"
 
 #: products/templates/products/product_list.html:28
 msgid "Todo"
-msgstr ""
+msgstr "Todo"
 
 #: products/templates/products/product_list.html:45
 msgid "Min"
-msgstr ""
+msgstr "Min"
 
 #: products/templates/products/product_list.html:47
 msgid "Max"
-msgstr ""
+msgstr "Max"
 
 #: products/templates/products/product_list.html:69
 msgid "Aplicar Filtros"
-msgstr ""
+msgstr "Aplicar Filtros"
 
 #: products/templates/products/product_list.html:70
 msgid "Limpiar"
-msgstr ""
+msgstr "Limpiar"
 
 #: products/templates/products/product_list.html:80
 msgid "Todos los Productos"
-msgstr ""
+msgstr "Todos los Productos"
 
 #: products/templates/products/product_list.html:98
 #: products/templates/products/product_list.html:100
 msgid "Lo Nuevo"
-msgstr ""
+msgstr "Lo Nuevo"
 
 #: products/templates/products/product_list.html:104
 #: products/templates/products/product_list.html:106
 msgid "Precio: Menor a Mayor"
-msgstr ""
+msgstr "Precio: Menor a Mayor"
 
 #: products/templates/products/product_list.html:110
 #: products/templates/products/product_list.html:112
 msgid "Precio: Mayor a Menor"
-msgstr ""
+msgstr "Precio: Mayor a Menor"
 
 #: products/templates/products/product_list.html:142
 msgid "No encontramos productos con esos filtros."
-msgstr ""
+msgstr "No encontramos productos con esos filtros."
 
 #: products/templates/products/product_list.html:143
 msgid "Intenta ajustar tu busqueda."
-msgstr ""
+msgstr "Intenta ajustar tu busqueda."
 
 #: products/templates/products/product_list.html:152
 msgid "Anterior"
-msgstr ""
+msgstr "Anterior"
 
 #: products/templates/products/product_list.html:155
 #, python-format
 msgid "Página %(current)s de %(total)s"
-msgstr ""
+msgstr "Página %(current)s de %(total)s"
 
 #: products/templates/products/product_list.html:159
 msgid "Siguiente"
-msgstr ""
+msgstr "Siguiente"
+
+# Runtime messages and validation
+msgid "Mostrar"
+msgstr "Mostrar"
+
+msgid "Ocultar"
+msgstr "Ocultar"
+
+msgid "Registro exitoso. ¡Bienvenido a UNLABELED!"
+msgstr "Registro exitoso. ¡Bienvenido a UNLABELED!"
+
+msgid "Has iniciado sesión correctamente."
+msgstr "Has iniciado sesión correctamente."
+
+msgid "Has cerrado sesión."
+msgstr "Has cerrado sesión."
+
+msgid "Este campo es obligatorio."
+msgstr "Este campo es obligatorio."
+
+msgid "Este campo solo permite números."
+msgstr "Este campo solo permite números."
+
+msgid "La ciudad solo puede contener letras y espacios."
+msgstr "La ciudad solo puede contener letras y espacios."
+
+msgid "Solo letras y espacios"
+msgstr "Solo letras y espacios"
+
+msgid "Solo números"
+msgstr "Solo números"
+
+msgid "Por favor corrige los errores del formulario de checkout."
+msgstr "Por favor corrige los errores del formulario de checkout."
+
+#, python-format
+msgid "¡Gracias por tu compra! Tu orden #%(order_id)s ha sido confirmada."
+msgstr "¡Gracias por tu compra! Tu orden #%(order_id)s ha sido confirmada."
+
+msgid "Ocurrió un error inesperado al procesar tu orden."
+msgstr "Ocurrió un error inesperado al procesar tu orden."
+
+#, python-format
+msgid "La orden #%(order_id)s ha sido cancelada y el stock restaurado."
+msgstr "La orden #%(order_id)s ha sido cancelada y el stock restaurado."
+
+#, python-format
+msgid "No se pudo cancelar la orden: %(error)s"
+msgstr "No se pudo cancelar la orden: %(error)s"
+
+msgid "Producto agregado al carrito."
+msgstr "Producto agregado al carrito."
+
+msgid "No tienes permisos para acceder a esta página."
+msgstr "No tienes permisos para acceder a esta página."
+
+msgid "La dirección de envío es obligatoria."
+msgstr "La dirección de envío es obligatoria."
+
+msgid "La ciudad es obligatoria."
+msgstr "La ciudad es obligatoria."
+
+msgid "El código postal es obligatorio."
+msgstr "El código postal es obligatorio."
+
+msgid "El teléfono de contacto es obligatorio."
+msgstr "El teléfono de contacto es obligatorio."
+
+msgid "El estado de la orden no es válido."
+msgstr "El estado de la orden no es válido."
+
+msgid "No se puede cancelar una orden ya enviada o entregada"
+msgstr "No se puede cancelar una orden ya enviada o entregada"
+
+msgid "La cantidad debe ser positiva."
+msgstr "La cantidad debe ser positiva."
+
+msgid "La talla seleccionada no es válida."
+msgstr "La talla seleccionada no es válida."
+
+msgid "El carrito está vacío."
+msgstr "El carrito está vacío."
+
+msgid "Los datos de envío no son válidos."
+msgstr "Los datos de envío no son válidos."
+
+msgid "La cantidad a aumentar debe ser positiva."
+msgstr "La cantidad a aumentar debe ser positiva."
+
+msgid "La cantidad a disminuir debe ser positiva."
+msgstr "La cantidad a disminuir debe ser positiva."
+
+#, python-format
+msgid "Stock insuficiente. Disponible: %(quantity)s"
+msgstr "Stock insuficiente. Disponible: %(quantity)s"
+
+msgid "La cantidad no puede ser negativa."
+msgstr "La cantidad no puede ser negativa."
+
+msgid "Debes seleccionar una talla."
+msgstr "Debes seleccionar una talla."
+
+#, python-format
+msgid "La talla %(size)s está agotada."
+msgstr "La talla %(size)s está agotada."
+
+#, python-format
+msgid "No hay suficiente stock para la talla %(size)s."
+msgstr "No hay suficiente stock para la talla %(size)s."
+
+#, python-format
+msgid "Stock insuficiente para %(product)s talla %(size)s. (Quedan %(quantity)s)"
+msgstr "Stock insuficiente para %(product)s talla %(size)s. (Quedan %(quantity)s)"

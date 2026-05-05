@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.text import slugify
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
+from django.utils.translation import gettext_lazy as _
 from decimal import Decimal
 
 from core.models import TimestampMixin, SoftDeleteMixin, ActivableMixin
@@ -143,15 +144,15 @@ class StockPorTalla(models.Model):
 
     def aumentar(self, cantidad):
         if cantidad <= 0:
-            raise ValueError("La cantidad a aumentar debe ser positiva.")
+            raise ValueError(_("La cantidad a aumentar debe ser positiva."))
         self.cantidad += cantidad
         self.save(update_fields=['cantidad'])
 
     def disminuir(self, cantidad):
         if cantidad <= 0:
-            raise ValueError("La cantidad a disminuir debe ser positiva.")
+            raise ValueError(_("La cantidad a disminuir debe ser positiva."))
         if cantidad > self.cantidad:
-            raise ValueError(f"Stock insuficiente. Disponible: {self.cantidad}")
+            raise ValueError(_("Stock insuficiente. Disponible: %(quantity)s") % {"quantity": self.cantidad})
         self.cantidad -= cantidad
         self.save(update_fields=['cantidad'])
 
@@ -160,4 +161,4 @@ class StockPorTalla(models.Model):
 
     def clean(self):
         if self.cantidad < 0:
-            raise ValidationError({"cantidad": "La cantidad no puede ser negativa."})
+            raise ValidationError({"cantidad": _("La cantidad no puede ser negativa.")})

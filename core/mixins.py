@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.utils.translation import gettext_lazy as _
 
 
 class SuccessMessageMixin:
@@ -21,7 +22,7 @@ class AdminRequiredMixin(LoginRequiredMixin):
         if not request.user.is_authenticated:
             return self.handle_no_permission()
         if request.user.rol != 'admin':
-            messages.error(request, "No tienes permisos para acceder a esta página.")
+            messages.error(request, _("No tienes permisos para acceder a esta página."))
             return redirect('core:home')
         return super().dispatch(request, *args, **kwargs)
 

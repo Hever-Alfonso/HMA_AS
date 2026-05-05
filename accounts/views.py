@@ -4,6 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
+from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import CreateView, TemplateView
 
@@ -18,7 +19,7 @@ class RegistroView(CreateView):
     def form_valid(self, form):
         user = form.save()
         login(self.request, user)
-        messages.success(self.request, "Registro exitoso. ¡Bienvenido a UNLABELED!")
+        messages.success(self.request, _("Registro exitoso. ¡Bienvenido a UNLABELED!"))
         return redirect(self.success_url)
 
 
@@ -27,19 +28,19 @@ class CustomLoginView(LoginView):
 
     def form_valid(self, form):
         response = super().form_valid(form)
-        messages.success(self.request, "Has iniciado sesión correctamente.")
+        messages.success(self.request, _("Has iniciado sesión correctamente."))
         return response
 
 
 class CustomLogoutView(View):
     def post(self, request, *args, **kwargs):
         logout(request)
-        messages.info(request, "Has cerrado sesión.")
+        messages.info(request, _("Has cerrado sesión."))
         return render(request, 'usuarios/logout.html')
 
     def get(self, request, *args, **kwargs):
         logout(request)
-        messages.info(request, "Has cerrado sesión.")
+        messages.info(request, _("Has cerrado sesión."))
         return render(request, 'usuarios/logout.html')
 
 

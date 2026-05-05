@@ -2,6 +2,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from core.models import TimestampMixin
 from products.models import Producto, StockPorTalla
@@ -67,15 +68,15 @@ class Orden(TimestampMixin, models.Model):
     def clean(self):
         errors = {}
         if not self.direccion_envio:
-            errors["direccion_envio"] = "La dirección de envío es obligatoria."
+            errors["direccion_envio"] = _("La dirección de envío es obligatoria.")
         if not self.ciudad:
-            errors["ciudad"] = "La ciudad es obligatoria."
+            errors["ciudad"] = _("La ciudad es obligatoria.")
         if not self.codigo_postal:
-            errors["codigo_postal"] = "El código postal es obligatorio."
+            errors["codigo_postal"] = _("El código postal es obligatorio.")
         if not self.telefono_contacto:
-            errors["telefono_contacto"] = "El teléfono de contacto es obligatorio."
+            errors["telefono_contacto"] = _("El teléfono de contacto es obligatorio.")
         if self.estado not in self.EstadoOrden.values:
-            errors["estado"] = "El estado de la orden no es válido."
+            errors["estado"] = _("El estado de la orden no es válido.")
         if errors:
             raise ValidationError(errors)
 
@@ -93,7 +94,7 @@ class Orden(TimestampMixin, models.Model):
 
     def cancelar(self):
         if self.estado in [self.EstadoOrden.ENVIADA, self.EstadoOrden.ENTREGADA]:
-            raise ValueError("No se puede cancelar una orden ya enviada o entregada")
+            raise ValueError(_("No se puede cancelar una orden ya enviada o entregada"))
         self.estado = self.EstadoOrden.CANCELADA
         self.save(update_fields=['estado'])
 
@@ -126,8 +127,8 @@ class ItemOrden(models.Model):
 
     def save(self, *args, **kwargs):
         if self.cantidad <= 0:
-            raise ValueError("La cantidad debe ser positiva.")
+            raise ValueError(_("La cantidad debe ser positiva."))
         if self.talla not in StockPorTalla.Talla.values:
-            raise ValueError("La talla seleccionada no es válida.")
+            raise ValueError(_("La talla seleccionada no es válida."))
         self.subtotal = self.precio_unitario * self.cantidad
         super().save(*args, **kwargs)

@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
+from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import TemplateView
 
@@ -38,7 +39,7 @@ class CartAddView(View):
             messages.error(request, str(exc))
             return redirect("products:product_detail", slug=producto.slug)
 
-        messages.success(request, "Producto agregado al carrito.")
+        messages.success(request, _("Producto agregado al carrito."))
         return redirect("cart:detail")
 
 

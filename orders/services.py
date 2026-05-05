@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.utils.translation import gettext_lazy as _
 from cart.cart import Cart
 from cart.db_backend import DatabaseCartBackend
 from .models import Orden, ItemOrden
@@ -26,7 +27,7 @@ class OrdenService:
         session_cart = Cart(request)
 
         if len(session_cart) == 0:
-            raise ValueError("El carrito está vacío.")
+            raise ValueError(_("El carrito está vacío."))
 
         costo_envio = MockShippingCalculator.calculate(datos_envio.get('direccion_envio', ''))
 
@@ -42,7 +43,7 @@ class OrdenService:
         try:
             orden.full_clean()
         except ValidationError as exc:
-            raise ValueError("Los datos de envío no son válidos.") from exc
+            raise ValueError(_("Los datos de envío no son válidos.")) from exc
 
         # 2. Validar stock y crear items atómicamente
         for cart_item in session_cart:

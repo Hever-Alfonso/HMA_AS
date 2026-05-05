@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.utils.translation import gettext_lazy as _
 
 from .models import StockPorTalla
 
@@ -9,9 +10,9 @@ class InventoryService:
     @staticmethod
     def validate_size(size):
         if not size:
-            raise ValueError("Debes seleccionar una talla.")
+            raise ValueError(_("Debes seleccionar una talla."))
         if size not in StockPorTalla.Talla.values:
-            raise ValueError("La talla seleccionada no es válida.")
+            raise ValueError(_("La talla seleccionada no es válida."))
 
     @staticmethod
     def get_stock(product, size, for_update=False):
@@ -25,30 +26,30 @@ class InventoryService:
     def validate_available(cls, product, size, quantity):
         cls.validate_size(size)
         if quantity <= 0:
-            raise ValueError("La cantidad debe ser positiva.")
+            raise ValueError(_("La cantidad debe ser positiva."))
 
         stock = cls.get_stock(product, size)
         available_stock = stock.cantidad if stock else 0
 
         if available_stock <= 0:
-            raise ValueError(f"La talla {size} está agotada.")
+            raise ValueError(_("La talla %(size)s está agotada.") % {"size": size})
         if quantity > available_stock:
-            raise ValueError(f"No hay suficiente stock para la talla {size}.")
+            raise ValueError(_("No hay suficiente stock para la talla %(size)s.") % {"size": size})
 
     @classmethod
     @transaction.atomic
     def decrease_stock(cls, product, size, quantity):
         cls.validate_size(size)
         if quantity <= 0:
-            raise ValueError("La cantidad debe ser positiva.")
+            raise ValueError(_("La cantidad debe ser positiva."))
 
         stock = cls.get_stock(product, size, for_update=True)
         if stock is None:
-            raise ValueError(f"La talla {size} está agotada.")
+            raise ValueError(_("La talla %(size)s está agotada.") % {"size": size})
         if not stock.esta_disponible(quantity):
             raise ValueError(
-                f"Stock insuficiente para {product.nombre} "
-                f"talla {size}. (Quedan {stock.cantidad})"
+                _("Stock insuficiente para %(product)s talla %(size)s. (Quedan %(quantity)s)")
+                % {"product": product.nombre, "size": size, "quantity": stock.cantidad}
             )
 
         stock.disminuir(quantity)
@@ -59,7 +60,7 @@ class InventoryService:
     def increase_stock(cls, product, size, quantity):
         cls.validate_size(size)
         if quantity <= 0:
-            raise ValueError("La cantidad debe ser positiva.")
+            raise ValueError(_("La cantidad debe ser positiva."))
 
         stock = cls.get_stock(product, size, for_update=True)
         if stock is None:
