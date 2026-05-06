@@ -1,5 +1,7 @@
 from django.db import models
 from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 from products.models import Producto, StockPorTalla
 from core.models import TimestampMixin
 
@@ -43,6 +45,8 @@ class Carrito(TimestampMixin, models.Model):
         )['cantidad__sum'] or 0
 
     def agregar_item(self, producto_obj, talla, cantidad=1):
+        if cantidad <= 0:
+            raise ValueError(_("La cantidad debe ser positiva."))
         item, created = ItemCarrito.objects.get_or_create(
             carrito=self,
             producto=producto_obj,
@@ -57,6 +61,9 @@ class Carrito(TimestampMixin, models.Model):
         ItemCarrito.objects.filter(carrito=self, producto=producto_obj, talla=talla).delete()
 
     def actualizar_item(self, producto_obj, talla, cantidad):
+        if cantidad <= 0:
+            self.remover_item(producto_obj, talla)
+            return
         item = ItemCarrito.objects.filter(carrito=self, producto=producto_obj, talla=talla).first()
         if item:
             item.cantidad = cantidad
@@ -92,7 +99,14 @@ class ItemCarrito(models.Model):
     def subtotal(self):
         return self.precio_unitario * self.cantidad
 
+    def clean(self):
+        if self.cantidad <= 0:
+            raise ValidationError({"cantidad": _("La cantidad debe ser positiva.")})
+        if self.talla not in StockPorTalla.Talla.values:
+            raise ValidationError({"talla": _("La talla seleccionada no es válida.")})
+
     def save(self, *args, **kwargs):
         if not self.precio_unitario:
             self.precio_unitario = self.producto.precio
+        self.full_clean()
         super().save(*args, **kwargs)

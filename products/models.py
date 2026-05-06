@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils.text import slugify
+from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
+from django.utils.translation import gettext_lazy as _
 from decimal import Decimal
 
 from core.models import TimestampMixin, SoftDeleteMixin, ActivableMixin
@@ -9,7 +11,7 @@ from core.managers import SoftDeleteManager, ActiveManager
 
 class Categoria(TimestampMixin, models.Model):
     nombre = models.CharField(max_length=100, unique=True)
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(unique=True, db_index=True)
     descripcion = models.TextField(blank=True)
     imagen_portada = models.ImageField(upload_to='categorias/', null=True, blank=True)
 
@@ -27,7 +29,7 @@ class Categoria(TimestampMixin, models.Model):
 
 class Marca(TimestampMixin, models.Model):
     nombre = models.CharField(max_length=100, unique=True)
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(unique=True, db_index=True)
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -40,11 +42,12 @@ class Marca(TimestampMixin, models.Model):
 
 class Producto(TimestampMixin, SoftDeleteMixin, ActivableMixin, models.Model):
     nombre = models.CharField(max_length=200)
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(unique=True, db_index=True)
     descripcion = models.TextField()
     precio = models.DecimalField(
         max_digits=10,
         decimal_places=2,
+        db_index=True,
         validators=[MinValueValidator(Decimal('0.01'))]
     )
     marca = models.ForeignKey(
@@ -58,6 +61,7 @@ class Producto(TimestampMixin, SoftDeleteMixin, ActivableMixin, models.Model):
         related_name='productos'
     )
     imagen = models.ImageField(upload_to='productos/', null=True, blank=True)
+    activo = models.BooleanField(default=True, db_index=True)
 
     objects = SoftDeleteManager()
     activos = ActiveManager()
@@ -85,6 +89,9 @@ class Producto(TimestampMixin, SoftDeleteMixin, ActivableMixin, models.Model):
     class Meta:
         ordering = ['-created_at']
         verbose_name_plural = 'Productos'
+        indexes = [
+            models.Index(fields=['activo', 'precio'], name='prod_activo_precio_idx'),
+        ]
 
 
 class ImagenProducto(models.Model):
@@ -128,19 +135,30 @@ class StockPorTalla(models.Model):
         unique_together = ['producto', 'talla']
         verbose_name = 'Stock por Talla'
         verbose_name_plural = 'Stock por Tallas'
+        indexes = [
+            models.Index(fields=['producto', 'talla'], name='stock_producto_talla_idx'),
+        ]
 
     def __str__(self):
         return f"{self.producto.nombre} - Talla {self.talla}: {self.cantidad}"
 
     def aumentar(self, cantidad):
+        if cantidad <= 0:
+            raise ValueError(_("La cantidad a aumentar debe ser positiva."))
         self.cantidad += cantidad
         self.save(update_fields=['cantidad'])
 
     def disminuir(self, cantidad):
+        if cantidad <= 0:
+            raise ValueError(_("La cantidad a disminuir debe ser positiva."))
         if cantidad > self.cantidad:
-            raise ValueError(f"Stock insuficiente. Disponible: {self.cantidad}")
+            raise ValueError(_("Stock insuficiente. Disponible: %(quantity)s") % {"quantity": self.cantidad})
         self.cantidad -= cantidad
         self.save(update_fields=['cantidad'])
 
     def esta_disponible(self, cantidad=1):
         return self.cantidad >= cantidad
+
+    def clean(self):
+        if self.cantidad < 0:
+            raise ValidationError({"cantidad": _("La cantidad no puede ser negativa.")})

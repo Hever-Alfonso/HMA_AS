@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 import os
+import sys
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -46,7 +47,7 @@ INSTALLED_APPS = [
     'core',
     'accounts',
     'products',
-    'cart',
+    'cart.apps.CartConfig',
     'orders',
 ]
 
@@ -97,6 +98,14 @@ DATABASES = {
         'PORT': os.environ.get('DB_PORT', '5432'),
     }
 }
+
+if 'test' in sys.argv:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'test.sqlite3',
+        }
+    }
 
 
 # Password validation

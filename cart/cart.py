@@ -52,7 +52,8 @@ class Cart:
         self.session.modified = True
 
     def clear(self):
-        self.session[self.SESSION_KEY] = {}
+        self.cart = {}
+        self.session[self.SESSION_KEY] = self.cart
         self.session.modified = True
 
     def __iter__(self):

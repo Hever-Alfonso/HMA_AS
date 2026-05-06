@@ -531,3 +531,116 @@ msgstr "You have successfully logged out. Thank you for visiting UNLABELED."
 
 msgid "Volver al inicio"
 msgstr "Back to Home"
+
+msgid "Mostrar"
+msgstr "Show"
+
+msgid "Ocultar"
+msgstr "Hide"
+
+# Runtime messages and validation
+msgid "Registro exitoso. ¡Bienvenido a UNLABELED!"
+msgstr "Registration successful. Welcome to UNLABELED!"
+
+msgid "Has iniciado sesión correctamente."
+msgstr "You have logged in successfully."
+
+msgid "Has cerrado sesión."
+msgstr "You have logged out."
+
+msgid "Este campo es obligatorio."
+msgstr "This field is required."
+
+msgid "Este campo solo permite números."
+msgstr "This field only allows numbers."
+
+msgid "La ciudad solo puede contener letras y espacios."
+msgstr "City can only contain letters and spaces."
+
+msgid "Solo letras y espacios"
+msgstr "Letters and spaces only"
+
+msgid "Solo números"
+msgstr "Numbers only"
+
+msgid "Por favor corrige los errores del formulario de checkout."
+msgstr "Please correct the errors in the checkout form."
+
+#, python-format
+msgid "¡Gracias por tu compra! Tu orden #%(order_id)s ha sido confirmada."
+msgstr "Thank you for your purchase! Your order #%(order_id)s has been confirmed."
+
+msgid "Ocurrió un error inesperado al procesar tu orden."
+msgstr "An unexpected error occurred while processing your order."
+
+#, python-format
+msgid "La orden #%(order_id)s ha sido cancelada y el stock restaurado."
+msgstr "Order #%(order_id)s has been canceled and stock has been restored."
+
+#, python-format
+msgid "No se pudo cancelar la orden: %(error)s"
+msgstr "The order could not be canceled: %(error)s"
+
+msgid "Producto agregado al carrito."
+msgstr "Product added to cart."
+
+msgid "No tienes permisos para acceder a esta página."
+msgstr "You do not have permission to access this page."
+
+msgid "La dirección de envío es obligatoria."
+msgstr "Shipping address is required."
+
+msgid "La ciudad es obligatoria."
+msgstr "City is required."
+
+msgid "El código postal es obligatorio."
+msgstr "Zip code is required."
+
+msgid "El teléfono de contacto es obligatorio."
+msgstr "Contact phone is required."
+
+msgid "El estado de la orden no es válido."
+msgstr "The order status is not valid."
+
+msgid "No se puede cancelar una orden ya enviada o entregada"
+msgstr "An order that has already been shipped or delivered cannot be canceled."
+
+msgid "La cantidad debe ser positiva."
+msgstr "Quantity must be positive."
+
+msgid "La talla seleccionada no es válida."
+msgstr "The selected size is not valid."
+
+msgid "El carrito está vacío."
+msgstr "The cart is empty."
+
+msgid "Los datos de envío no son válidos."
+msgstr "Shipping details are not valid."
+
+msgid "La cantidad a aumentar debe ser positiva."
+msgstr "The quantity to increase must be positive."
+
+msgid "La cantidad a disminuir debe ser positiva."
+msgstr "The quantity to decrease must be positive."
+
+#, python-format
+msgid "Stock insuficiente. Disponible: %(quantity)s"
+msgstr "Insufficient stock. Available: %(quantity)s"
+
+msgid "La cantidad no puede ser negativa."
+msgstr "Quantity cannot be negative."
+
+msgid "Debes seleccionar una talla."
+msgstr "You must select a size."
+
+#, python-format
+msgid "La talla %(size)s está agotada."
+msgstr "Size %(size)s is out of stock."
+
+#, python-format
+msgid "No hay suficiente stock para la talla %(size)s."
+msgstr "There is not enough stock for size %(size)s."
+
+#, python-format
+msgid "Stock insuficiente para %(product)s talla %(size)s. (Quedan %(quantity)s)"
+msgstr "Insufficient stock for %(product)s size %(size)s. (%(quantity)s left)"
