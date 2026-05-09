@@ -170,3 +170,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = 'accounts:login'
 LOGIN_REDIRECT_URL = 'core:home'
 LOGOUT_REDIRECT_URL = 'core:home'
+
+# Shipping provider configuration.
+# "external" consumes a public exchange-rate API and falls back to the fixed
+# value if the service is unavailable.
+SHIPPING_RATE_PROVIDER = os.environ.get('SHIPPING_RATE_PROVIDER', 'external')
+EXCHANGE_RATE_API_URL = os.environ.get('EXCHANGE_RATE_API_URL', 'https://open.er-api.com/v6/latest/USD')
+BASE_SHIPPING_USD = os.environ.get('BASE_SHIPPING_USD', '4.00')
+FIXED_SHIPPING_RATE = os.environ.get('FIXED_SHIPPING_RATE', '15000.00')
+SHIPPING_API_TIMEOUT = int(os.environ.get('SHIPPING_API_TIMEOUT', '3'))

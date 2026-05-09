@@ -4,14 +4,8 @@ from django.utils.translation import gettext_lazy as _
 from cart.cart import Cart
 from cart.db_backend import DatabaseCartBackend
 from .models import Orden, ItemOrden
+from .shipping import ShippingRateProviderFactory
 from products.services import InventoryService
-
-
-class MockShippingCalculator:
-    @staticmethod
-    def calculate(direccion):
-        from decimal import Decimal
-        return Decimal("15.00")
 
 
 class OrdenService:
@@ -29,7 +23,8 @@ class OrdenService:
         if len(session_cart) == 0:
             raise ValueError(_("El carrito está vacío."))
 
-        costo_envio = MockShippingCalculator.calculate(datos_envio.get('direccion_envio', ''))
+        shipping_provider = ShippingRateProviderFactory.create()
+        costo_envio = shipping_provider.calculate(datos_envio)
 
         # 1. Crear Orden
         orden = Orden.objects.create(
