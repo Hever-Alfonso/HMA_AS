@@ -2,6 +2,7 @@ from decimal import Decimal
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+from django.test import override_settings
 from django.urls import reverse
 
 from .models import Categoria, Marca, Producto, StockPorTalla
@@ -146,6 +147,7 @@ class ProductCatalogTest(ProductTestMixin, TestCase):
         self.assertEqual([item.talla for item in response.context['inventory_items']], ['XS', 'M'])
 
 
+@override_settings(ALLOWED_HOSTS=['testserver'])
 class ProductApiTest(ProductTestMixin, TestCase):
     def setUp(self):
         self.category, self.brand, self.product = self.create_base_product()
@@ -157,12 +159,24 @@ class ProductApiTest(ProductTestMixin, TestCase):
         )
 
     def test_product_api_list_is_public_and_returns_active_products(self):
-        response = self.client.get(reverse('products:api_product_list'))
+        response = self.client.get(reverse('products_api:product_list'))
 
         self.assertEqual(response.status_code, 200)
         payload = response.json()
         self.assertEqual(len(payload['results']), 1)
         self.assertEqual(payload['results'][0]['slug'], self.product.slug)
+        self.assertEqual(
+            payload['results'][0]['detail_url'],
+            f'http://testserver{reverse("products_api:product_detail", args=[self.product.slug])}',
+        )
+
+    def test_public_product_service_uses_public_route(self):
+        response = self.client.get(reverse('products_api:product_list'))
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual(payload['results'][0]['name'], self.product.nombre)
+        self.assertIn('/api/public/products/', payload['results'][0]['detail_url'])
 
     def test_product_api_filters_results(self):
         _, _, expensive_product = self.create_base_product(
@@ -173,7 +187,7 @@ class ProductApiTest(ProductTestMixin, TestCase):
         StockPorTalla.objects.create(producto=expensive_product, talla='L', cantidad=2)
 
         response = self.client.get(
-            reverse('products:api_product_list'),
+            reverse('products_api:product_list'),
             {
                 'q': 'Test',
                 'category': self.category.slug,
@@ -188,19 +202,20 @@ class ProductApiTest(ProductTestMixin, TestCase):
         self.assertEqual(slugs, [self.product.slug])
 
     def test_product_api_detail_returns_product_data(self):
-        response = self.client.get(reverse('products:api_product_detail', args=[self.product.slug]))
+        response = self.client.get(reverse('products_api:product_detail', args=[self.product.slug]))
 
         self.assertEqual(response.status_code, 200)
         payload = response.json()
         self.assertEqual(payload['slug'], self.product.slug)
         self.assertEqual(payload['brand']['slug'], self.brand.slug)
+        self.assertEqual(payload['stock_total'], 5)
         self.assertEqual(payload['stock_by_size'], [{'size': 'M', 'quantity': 5}])
 
     def test_product_api_detail_returns_json_404_for_inactive_or_missing_product(self):
         inactive_response = self.client.get(
-            reverse('products:api_product_detail', args=[self.inactive_product.slug])
+            reverse('products_api:product_detail', args=[self.inactive_product.slug])
         )
-        missing_response = self.client.get(reverse('products:api_product_detail', args=['missing']))
+        missing_response = self.client.get(reverse('products_api:product_detail', args=['missing']))
 
         self.assertEqual(inactive_response.status_code, 404)
         self.assertEqual(missing_response.status_code, 404)

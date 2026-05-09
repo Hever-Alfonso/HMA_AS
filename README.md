@@ -116,6 +116,54 @@ HMA_AS/
 
 ---
 
+## Servicio web JSON para equipos aliados
+
+La aplicación expone un servicio web público en formato JSON para que otros equipos puedan consumir información relevante del ecommerce y mostrarla en sus propias vistas.
+
+### Endpoints
+
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| `GET` | `/api/public/products/` | Lista productos activos del ecommerce |
+| `GET` | `/api/public/products/<slug>/` | Consulta el detalle de un producto activo |
+
+### Filtros soportados
+
+El listado acepta los mismos filtros principales del catálogo:
+
+| Parámetro | Ejemplo | Descripción |
+|-----------|---------|-------------|
+| `q` | `/api/public/products/?q=shirt` | Busca por nombre o descripción |
+| `category` | `/api/public/products/?category=t-shirts` | Filtra por slug de categoría |
+| `size` | `/api/public/products/?size=M` | Filtra productos con stock disponible en una talla |
+| `min_price` | `/api/public/products/?min_price=50000` | Precio mínimo |
+| `max_price` | `/api/public/products/?max_price=150000` | Precio máximo |
+| `sort` | `/api/public/products/?sort=price_asc` | Ordena por `newest`, `price_asc` o `price_desc` |
+
+### Ejemplo de respuesta
+
+```json
+{
+  "results": [
+    {
+      "id": 1,
+      "name": "Classic T-Shirt",
+      "slug": "classic-t-shirt",
+      "description": "Basic cotton t-shirt.",
+      "price": "85000.00",
+      "brand": "HMA",
+      "category": "T-Shirts",
+      "image_url": "http://localhost:8000/media/productos/classic.jpg",
+      "detail_url": "http://localhost:8000/api/public/products/classic-t-shirt/"
+    }
+  ]
+}
+```
+
+Las URLs de imagen y detalle se entregan como URLs absolutas para facilitar el consumo desde aplicaciones externas.
+
+---
+
 ## Cómo ejecutar el proyecto
 
 ### Requisitos previos

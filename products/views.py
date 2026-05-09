@@ -5,6 +5,7 @@ from django.views import View
 from django.views.generic import DetailView, ListView
 
 from .constants import SIZE_ORDER
+from .api_serializers import ProductApiSerializer
 from .models import Categoria, Producto, StockPorTalla
 from .repositories import ProductoRepository
 
@@ -90,6 +91,7 @@ class ProductDetailView(DetailView):
 class ProductApiListView(View):
     def get(self, request, *args, **kwargs):
         repository = ProductoRepository()
+        serializer = ProductApiSerializer(request)
         products = repository.buscar(
             query=request.GET.get('q'),
             categoria=request.GET.get('category'),
@@ -99,61 +101,17 @@ class ProductApiListView(View):
             sort=request.GET.get('sort'),
         )
 
-        data = [
-            {
-                'id': product.id,
-                'name': product.nombre,
-                'slug': product.slug,
-                'price': str(product.precio),
-                'brand': product.marca.nombre,
-                'category': product.categoria.nombre,
-                'image': product.imagen.url if product.imagen else None,
-            }
-            for product in products
-        ]
+        data = [serializer.serialize_list_item(product) for product in products]
         return JsonResponse({'results': data})
 
 
 class ProductApiDetailView(View):
     def get(self, request, slug, *args, **kwargs):
         repository = ProductoRepository()
+        serializer = ProductApiSerializer(request)
         try:
             product = repository.obtener_activo_por_slug(slug)
         except Producto.DoesNotExist:
             return JsonResponse({'detail': 'Producto no encontrado.'}, status=404)
 
-        stock_items = sorted(
-            product.stock_por_talla.all(),
-            key=lambda item: SIZE_ORDER.index(item.talla)
-            if item.talla in SIZE_ORDER
-            else len(SIZE_ORDER),
-        )
-        data = {
-            'id': product.id,
-            'name': product.nombre,
-            'slug': product.slug,
-            'description': product.descripcion,
-            'price': str(product.precio),
-            'brand': {
-                'name': product.marca.nombre,
-                'slug': product.marca.slug,
-            },
-            'category': {
-                'name': product.categoria.nombre,
-                'slug': product.categoria.slug,
-            },
-            'image': product.imagen.url if product.imagen else None,
-            'stock_by_size': [
-                {'size': item.talla, 'quantity': item.cantidad}
-                for item in stock_items
-            ],
-            'images': [
-                {
-                    'url': image.imagen.url,
-                    'order': image.orden,
-                    'is_main': image.es_principal,
-                }
-                for image in product.imagenes.all()
-            ],
-        }
-        return JsonResponse(data)
+        return JsonResponse(serializer.serialize_detail(product))
