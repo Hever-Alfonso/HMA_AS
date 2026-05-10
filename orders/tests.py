@@ -1,7 +1,7 @@
 from decimal import Decimal
 
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from cart.cart import Cart
@@ -41,6 +41,7 @@ class OrderTestMixin:
         }
 
 
+@override_settings(SHIPPING_RATE_PROVIDER='fixed', FIXED_SHIPPING_RATE='15000.00')
 class CheckoutIntegrationTest(OrderTestMixin, TestCase):
     def setUp(self):
         self.user = self.create_user()
@@ -69,6 +70,55 @@ class CheckoutIntegrationTest(OrderTestMixin, TestCase):
 
         self.assertRedirects(response, reverse('cart:detail'))
         self.assertEqual(Orden.objects.count(), 0)
+
+    def test_checkout_creates_paid_order_with_fixed_shipping_provider(self):
+        session = self.client.session
+        session[Cart.SESSION_KEY] = {
+            f'{self.product.id}:M': {
+                'producto_id': str(self.product.id),
+                'talla': 'M',
+                'cantidad': 1,
+                'precio_unitario': str(self.product.precio),
+            }
+        }
+        session.save()
+
+        response = self.client.post(reverse('orders:checkout'), self.valid_checkout_data())
+
+        order = Orden.objects.get()
+        self.assertRedirects(response, reverse('orders:detalle_orden', args=[order.id]))
+        self.assertEqual(order.estado, Orden.EstadoOrden.PAGADA)
+        self.assertEqual(order.costo_envio, Decimal('15000.00'))
+        self.assertEqual(order.monto_total, Decimal('15100.00'))
+
+
+class ShippingRateProviderTest(OrderTestMixin, TestCase):
+    @override_settings(
+        SHIPPING_RATE_PROVIDER='external',
+        BASE_SHIPPING_USD='4.00',
+        EXCHANGE_RATE_API_URL='https://example.test/latest/USD',
+    )
+    def test_external_provider_consumes_exchange_rate_api(self):
+        from unittest.mock import patch
+
+        from orders.shipping import ShippingRateProviderFactory
+
+        class FakeResponse:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, exc_type, exc, traceback):
+                return False
+
+            def read(self):
+                return b'{"rates": {"COP": 4000}}'
+
+        with patch('orders.shipping.urlopen', return_value=FakeResponse()) as urlopen_mock:
+            provider = ShippingRateProviderFactory.create()
+            cost = provider.calculate(self.valid_checkout_data())
+
+        urlopen_mock.assert_called_once()
+        self.assertEqual(cost, Decimal('16000.00'))
 
 
 class OrderPermissionTest(OrderTestMixin, TestCase):
