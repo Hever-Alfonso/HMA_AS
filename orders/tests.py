@@ -1,10 +1,12 @@
 from decimal import Decimal
+from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from cart.cart import Cart
+from orders.shipping import ShippingRateProviderFactory
 from products.models import Categoria, Marca, Producto, StockPorTalla
 
 from .models import Orden
@@ -99,10 +101,6 @@ class ShippingRateProviderTest(OrderTestMixin, TestCase):
         EXCHANGE_RATE_API_URL='https://example.test/latest/USD',
     )
     def test_external_provider_consumes_exchange_rate_api(self):
-        from unittest.mock import patch
-
-        from orders.shipping import ShippingRateProviderFactory
-
         class FakeResponse:
             def __enter__(self):
                 return self

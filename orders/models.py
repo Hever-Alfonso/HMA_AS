@@ -2,6 +2,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from core.models import TimestampMixin
@@ -87,7 +88,6 @@ class Orden(TimestampMixin, models.Model):
         return total
 
     def marcar_como_pagada(self):
-        from django.utils import timezone
         self.estado = self.EstadoOrden.PAGADA
         self.fecha_pago = timezone.now()
         self.save(update_fields=['estado', 'fecha_pago'])
