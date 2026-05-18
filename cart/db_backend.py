@@ -42,6 +42,13 @@ class DatabaseCartBackend(CartBackend):
         item.cantidad = quantity
         item.save(update_fields=['cantidad'])
 
+    def remove_item(self, product, size) -> None:
+        ItemCarrito.objects.filter(
+            carrito=self.cart,
+            producto=product,
+            talla=size,
+        ).delete()
+
     def get_items(self) -> list:
         return [
             {

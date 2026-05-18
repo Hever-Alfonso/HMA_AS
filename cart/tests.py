@@ -8,7 +8,7 @@ from products.models import Categoria, Marca, Producto, StockPorTalla
 
 from .cart import Cart
 from .models import Carrito, ItemCarrito
-from .services import CartMergeService
+from .services import CartMergeService, CartService
 
 
 class CartTestMixin:
@@ -29,6 +29,10 @@ class CartTestMixin:
     def request_with_session(self):
         session = self.client.session
         return SimpleNamespace(session=session)
+
+    def request_with_user_and_session(self, user):
+        session = self.client.session
+        return SimpleNamespace(session=session, user=user)
 
 
 class CartSessionTest(CartTestMixin, TestCase):
@@ -98,3 +102,40 @@ class CartMergeServiceTest(CartTestMixin, TestCase):
         merged_session = self.request.session[Cart.SESSION_KEY]
         self.assertEqual(merged_session[f'{self.product.id}:M']['cantidad'], 5)
         self.assertEqual(merged_session[f'{self.other_product.id}:M']['cantidad'], 1)
+
+
+class CartServiceAuthenticatedTest(CartTestMixin, TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(
+            username='buyer',
+            email='buyer@example.com',
+            password='pass12345',
+        )
+        self.product = self.create_product()
+        self.request = self.request_with_user_and_session(self.user)
+
+    def test_authenticated_add_persists_cart_in_database_and_session(self):
+        CartService.add_item(self.request, self.product, 'M', 2)
+
+        cart = Carrito.objects.get(usuario=self.user)
+        item = cart.items.get(producto=self.product, talla='M')
+        self.assertEqual(item.cantidad, 2)
+
+        session_item = self.request.session[Cart.SESSION_KEY][f'{self.product.id}:M']
+        self.assertEqual(session_item['cantidad'], 2)
+
+    def test_authenticated_update_and_remove_keep_database_and_session_synced(self):
+        CartService.add_item(self.request, self.product, 'M', 2)
+        CartService.update_item(self.request, self.product, 'M', 3)
+
+        cart = Carrito.objects.get(usuario=self.user)
+        self.assertEqual(cart.items.get(producto=self.product, talla='M').cantidad, 3)
+        self.assertEqual(
+            self.request.session[Cart.SESSION_KEY][f'{self.product.id}:M']['cantidad'],
+            3,
+        )
+
+        CartService.remove_item(self.request, self.product, 'M')
+
+        self.assertFalse(cart.items.filter(producto=self.product, talla='M').exists())
+        self.assertEqual(self.request.session[Cart.SESSION_KEY], {})

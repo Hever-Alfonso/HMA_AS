@@ -7,33 +7,67 @@ from .session_backend import SessionCartBackend
 
 
 class CartService:
-    """Centraliza reglas de negocio del carrito de sesión."""
+    """Centraliza reglas de negocio del carrito."""
 
     @staticmethod
     def validate_item(producto, talla, cantidad):
         InventoryService.validate_available(producto, talla, cantidad)
 
+    @staticmethod
+    def should_persist(request):
+        user = getattr(request, 'user', None)
+        return bool(user and user.is_authenticated)
+
+    @staticmethod
+    def sync_session_from_db(request, db_backend):
+        session_backend = SessionCartBackend(request.session)
+        session_backend.clear()
+        for db_item in db_backend.get_items():
+            session_backend.set_item(
+                db_item['producto'],
+                db_item['talla'],
+                db_item['cantidad'],
+            )
+
     @classmethod
     def add_item(cls, request, producto, talla, cantidad):
         cls.validate_item(producto, talla, cantidad)
+        if cls.should_persist(request):
+            db_backend = DatabaseCartBackend(request.user)
+            db_backend.add_item(producto, talla, cantidad)
+            cls.sync_session_from_db(request, db_backend)
+            return
+
         SessionCartBackend(request.session).add_item(producto, talla, cantidad)
 
     @classmethod
     def update_item(cls, request, producto, talla, cantidad):
-        backend = SessionCartBackend(request.session)
         if cantidad <= 0:
-            backend.remove_item(producto, talla)
+            cls.remove_item(request, producto, talla)
             return
+
         cls.validate_item(producto, talla, cantidad)
-        backend.update_item(producto, talla, cantidad)
+        if cls.should_persist(request):
+            db_backend = DatabaseCartBackend(request.user)
+            db_backend.set_item(producto, talla, cantidad)
+            cls.sync_session_from_db(request, db_backend)
+            return
+
+        SessionCartBackend(request.session).update_item(producto, talla, cantidad)
 
     @staticmethod
     def remove_item(request, producto, talla):
+        if CartService.should_persist(request):
+            db_backend = DatabaseCartBackend(request.user)
+            db_backend.remove_item(producto, talla)
+            CartService.sync_session_from_db(request, db_backend)
+            return
+
         SessionCartBackend(request.session).remove_item(producto, talla)
 
 
 class CartMergeService:
-    """Sincroniza carrito de sesión y BD con precedencia para la BD."""
+    """Sincroniza carrito de sesion y BD con precedencia para la BD."""
 
     @staticmethod
     @transaction.atomic
