@@ -40,6 +40,8 @@
           id="{{ field.id_for_label }}"
           value="{{ field.value|default_if_none:'' }}"
           {% if field.field.required %}required{% endif %}
+          {% if field.field.widget.attrs.inputmode %}inputmode="{{ field.field.widget.attrs.inputmode }}"{% endif %}
+          {% if field.field.widget.attrs.pattern %}pattern="{{ field.field.widget.attrs.pattern }}"{% endif %}
           {% if field.field.widget.input_type == 'password' %}data-password-input="true" style="width:100%; padding:13px 90px 13px 16px; border:1px solid var(--border-strong); border-radius:4px; background:var(--bg); color:var(--fg); font-family:inherit; font-size:15px; outline:none; transition:border-color .2s;"{% else %}style="width:100%; padding:13px 16px; border:1px solid var(--border-strong); border-radius:4px; background:var(--bg); color:var(--fg); font-family:inherit; font-size:15px; outline:none; transition:border-color .2s;"{% endif %}
           onfocus="this.style.borderColor='var(--fg)'"
           onblur="this.style.borderColor='var(--border-strong)'"
